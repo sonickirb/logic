@@ -31,8 +31,14 @@ public class LogicManager : MonoBehaviour
         {
             Transform component = components.GetChild(i);
             Circuit circuit = component.GetComponent<Circuit>();
+
+            for (int n = 0; n < circuit.inputs.Count; n++)
+            {
+                if (!ConnectedWiresOnInput(circuit, n)) circuit.inputs[n] = false;
+            }
+
             circuit.Tick();
-        } 
+        }
         for (int i = 0; i < wires.childCount; i++)
         {
             Transform wire = wires.GetChild(i);
@@ -41,6 +47,17 @@ public class LogicManager : MonoBehaviour
             LineRenderer line = wire.GetComponent<LineRenderer>();
             line.material = w.from.outputs[w.output] ? nodeOn : nodeOff;
         }
+    }
+
+    public bool ConnectedWiresOnInput(Circuit circuit, int input)
+    {
+        for (int i = 0; i < wires.childCount; i++)
+        {
+            Transform wire = wires.GetChild(i);
+            Wire w = wire.GetComponent<Wire>();
+            if (w.to == circuit && w.input == input) return true;
+        }
+        return false;
     }
 
     public void MakeWire(Circuit from, int output, Circuit to, int input)

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CircuitDerive : MonoBehaviour
 {
+
     public virtual bool[] GetOutputs(List<bool> inputs)
     {
         bool[] outputs = new bool[inputs.Count];

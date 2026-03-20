@@ -11,12 +11,17 @@ public class MouseLook : MonoBehaviour
     float xRotation = 0f;
 
     public LayerMask hitMask;
+    public LayerMask wireMask;
     public Transform nodeSelector;
     public LineRenderer wireMaking;
+    public CapsuleCollider lineCollider;
 
     public Transform lookingAtNode;
     public bool makingWire;
     Transform firstNode;
+    
+    RaycastHit wireResult;
+    Transform lookingAtWire;
 
     void Start()
     {
@@ -34,9 +39,27 @@ public class MouseLook : MonoBehaviour
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         player.Rotate(Vector3.up * mouseX);
-
+        
         RaycastHit result;
-        bool hit = Physics.Raycast(transform.position, transform.forward, out result, 10000f, hitMask);
+        bool hit = Physics.Raycast(transform.position, transform.forward, out result, 300f, hitMask);
+
+        bool wireHit = false;
+        lookingAtWire = null;
+        for (int i = 0; i < LogicManager.Instance.wires.childCount; i++)
+        {
+            Transform wire = LogicManager.Instance.wires.GetChild(i);
+            LineRenderer line = wire.GetComponent<LineRenderer>();
+            
+            lineCollider.transform.position = line.GetPosition(0) + (line.GetPosition(1) - line.GetPosition(0)) / 2;
+            lineCollider.transform.LookAt(line.GetPosition(0));
+            lineCollider.height = (line.GetPosition(1) - line.GetPosition(0)).magnitude;
+            lineCollider.radius = line.startWidth / 2;
+            lineCollider.center = Vector3.zero;
+
+            wireHit = Physics.Raycast(transform.position, transform.forward, out wireResult, 300f, wireMask);
+            if (wireHit) lookingAtWire = wire;
+            if (wireHit) break;
+        }
 
         if (hit && result.collider.tag == "Node")
         {
@@ -64,6 +87,16 @@ public class MouseLook : MonoBehaviour
                 LogicManager.Instance.MakeWire(from, int.Parse(firstNode.name), to, int.Parse(lookingAtNode.name));
                 firstNode = null;
                 makingWire = false;
+            } else if (makingWire && !lookingAtNode)
+            {
+                makingWire = false;
+            }
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (lookingAtWire)
+            {
+                Destroy(lookingAtWire.gameObject);
             }
         }
         
@@ -72,6 +105,12 @@ public class MouseLook : MonoBehaviour
         {
             wireMaking.SetPosition(1, result.point);
             wireMaking.material = lookingAtNode ? LogicManager.Instance.select : LogicManager.Instance.wireNoNo;
+        } else
+        {
+            if (lookingAtWire)
+            {
+                lookingAtWire.GetComponent<LineRenderer>().material = LogicManager.Instance.wireNoNo;
+            }
         }
         
     }
