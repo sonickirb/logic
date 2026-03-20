@@ -12,6 +12,7 @@ public class MouseLook : MonoBehaviour
 
     public LayerMask hitMask;
     public Transform nodeSelector;
+    public LineRenderer wireMaking;
 
     public Transform lookingAtNode;
     public bool makingWire;
@@ -54,6 +55,7 @@ public class MouseLook : MonoBehaviour
                 makingWire = true;
                 firstNode = lookingAtNode;
                 lookingAtNode = null;
+                wireMaking.SetPosition(0, firstNode.position);
             }
             else if (makingWire && lookingAtNode)
             {
@@ -63,6 +65,13 @@ public class MouseLook : MonoBehaviour
                 firstNode = null;
                 makingWire = false;
             }
+        }
+        
+        wireMaking.gameObject.SetActive(makingWire);
+        if (makingWire)
+        {
+            wireMaking.SetPosition(1, result.point);
+            wireMaking.material = lookingAtNode ? LogicManager.Instance.select : LogicManager.Instance.wireNoNo;
         }
         
     }

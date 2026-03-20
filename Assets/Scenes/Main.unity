@@ -754,6 +754,80 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1264209812}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1139057520
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820086629281410723, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9021274070746371236, guid: 28386b83ea73ef24abe815a33fb75abb,
+        type: 3}
+      propertyPath: m_Name
+      value: WireCreation
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 28386b83ea73ef24abe815a33fb75abb, type: 3}
+--- !u!120 &1139057521 stripped
+LineRenderer:
+  m_CorrespondingSourceObject: {fileID: 3545828272444215344, guid: 28386b83ea73ef24abe815a33fb75abb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1139057520}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1264209808
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,7 +959,11 @@ MonoBehaviour:
   wires: {fileID: 347467548}
   nodePrefab: {fileID: 4384091297305449899, guid: 186e8921aeab45e4896c6ab4a8d9a352,
     type: 3}
+  wirePrefab: {fileID: 9021274070746371236, guid: 28386b83ea73ef24abe815a33fb75abb,
+    type: 3}
   nodeOn: {fileID: 2100000, guid: 962b7cbde86ffb448b635ea95f55286d, type: 2}
+  wireNoNo: {fileID: 2100000, guid: e4e9ed912f5c1004a950209795880020, type: 2}
+  select: {fileID: 2100000, guid: 402f537ba64e04d4596fd6b481ce9c37, type: 2}
   nodeOff: {fileID: 2100000, guid: 0f26904ac10b76f44bc50db3c1d74571, type: 2}
 --- !u!1 &1297917970
 GameObject:
@@ -1007,7 +1085,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afa04caf9cc007d48a6126b3b25a51a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputs: 0100
+  inputs: 0000
   outputs: 
   script: {fileID: 181249140}
 --- !u!1 &1348794720
@@ -1107,7 +1185,7 @@ Transform:
   m_GameObject: {fileID: 1361977598}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.25, y: 0.25, z: 3.25}
+  m_LocalPosition: {x: 0.75, y: 0.25, z: 3.25}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1459,6 +1537,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   nodeSelector: {fileID: 2145578202}
+  wireMaking: {fileID: 1139057521}
   lookingAtNode: {fileID: 0}
   makingWire: 0
 --- !u!1 &1833451100
@@ -1587,5 +1666,6 @@ SceneRoots:
   - {fileID: 181249139}
   - {fileID: 347467548}
   - {fileID: 2145578202}
+  - {fileID: 1139057520}
   - {fileID: 1550231794}
   - {fileID: 1348794723}
