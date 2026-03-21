@@ -23,6 +23,13 @@ public class MouseLook : MonoBehaviour
     RaycastHit wireResult;
     Transform lookingAtWire;
 
+    public Transform place;
+    public Transform deleteCircuit;
+    public GameObject placing;
+    Transform lookingAtCircuit;
+
+    public List<GameObject> inventory;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -43,7 +50,7 @@ public class MouseLook : MonoBehaviour
         RaycastHit result;
         bool hit = Physics.Raycast(transform.position, transform.forward, out result, 300f, hitMask);
 
-        bool wireHit = false;
+        bool wireHit;
         lookingAtWire = null;
         for (int i = 0; i < LogicManager.Instance.wires.childCount; i++)
         {
@@ -61,12 +68,20 @@ public class MouseLook : MonoBehaviour
             if (wireHit) break;
         }
 
+        bool IWannaDeleteACircuit = Input.GetKey(KeyCode.F);
+
         if (hit && result.collider.tag == "Node")
         {
             lookingAtNode = result.collider.transform;
         } else lookingAtNode = null;
 
         if (makingWire && lookingAtNode == firstNode) lookingAtNode = null;
+        if (placing) lookingAtNode = null;
+
+        if (hit && result.collider.transform.GetComponent<Circuit>() && !lookingAtNode && !makingWire && !placing && IWannaDeleteACircuit)
+        {
+            lookingAtCircuit = result.collider.transform;
+        } else lookingAtCircuit = null;
 
         nodeSelector.gameObject.SetActive(lookingAtNode != null);
         if (lookingAtNode) nodeSelector.position = lookingAtNode.position;
@@ -90,6 +105,10 @@ public class MouseLook : MonoBehaviour
             } else if (makingWire && !lookingAtNode)
             {
                 makingWire = false;
+            } else if (placing)
+            {
+                LogicManager.Instance.MakeCircuit(placing, place.position);
+                placing = null;
             }
         }
         if (Input.GetMouseButtonDown(1))
@@ -97,6 +116,9 @@ public class MouseLook : MonoBehaviour
             if (lookingAtWire)
             {
                 Destroy(lookingAtWire.gameObject);
+            } else if (lookingAtCircuit)
+            {
+                LogicManager.Instance.RemoveCircuit(lookingAtCircuit.gameObject);
             }
         }
         
@@ -111,6 +133,26 @@ public class MouseLook : MonoBehaviour
             {
                 lookingAtWire.GetComponent<LineRenderer>().material = LogicManager.Instance.wireNoNo;
             }
+        }
+
+        if (!makingWire)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) placing = inventory[0];
+            if (Input.GetKeyDown(KeyCode.Alpha2)) placing = inventory[1];
+            if (Input.GetKeyDown(KeyCode.Alpha3)) placing = inventory[2];
+            if (Input.GetKeyDown(KeyCode.Alpha4)) placing = inventory[3];
+        }
+
+        place.gameObject.SetActive(placing != null);
+        if (placing && hit)
+        {
+            place.position = result.point + (result.normal * (place.localScale.y / 2));
+        }
+
+        deleteCircuit.gameObject.SetActive(lookingAtCircuit != null);
+        if (lookingAtCircuit)
+        {
+            deleteCircuit.position = lookingAtCircuit.position;
         }
         
     }

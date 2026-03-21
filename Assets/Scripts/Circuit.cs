@@ -7,7 +7,8 @@ public class Circuit : MonoBehaviour
 
     public List<bool> inputs;
     public List<bool> outputs;
-    public CircuitDerive script;
+    public string scriptID;
+    CircuitDerive script;
 
     Transform nodeInputsParent;
     Transform nodeOutputsParent;
@@ -15,8 +16,10 @@ public class Circuit : MonoBehaviour
     List<GameObject> nodeInputs = new List<GameObject>();
     List<GameObject> nodeOutputs = new List<GameObject>();
 
-    void Awake()
+    void Start()
     {
+        script = LogicManager.Instance.transform.Find(scriptID).GetComponent<CircuitDerive>();
+
         nodeInputsParent = transform.Find("Inputs");
         nodeOutputsParent = transform.Find("Outputs");
     }

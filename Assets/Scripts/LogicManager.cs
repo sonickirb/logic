@@ -18,14 +18,27 @@ public class LogicManager : MonoBehaviour
     public Material select;
     public Material nodeOff;
 
+    public bool autoTick;
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         Instance = this;
     }
 
-    // FixedUpdate is called every game tick
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I)) autoTick = !autoTick;
+        if (Input.GetKeyDown(KeyCode.P) && !autoTick) Tick();
+    }
+
+    // FixedUpdate is called every logic tick
     void FixedUpdate()
+    {
+        if (autoTick) Tick();
+    }
+
+    public void Tick()
     {
         for (int i = 0; i < components.childCount; i++)
         {
@@ -59,6 +72,16 @@ public class LogicManager : MonoBehaviour
         }
         return false;
     }
+    public bool ConnectedWiresOnOutput(Circuit circuit, int output)
+    {
+        for (int i = 0; i < wires.childCount; i++)
+        {
+            Transform wire = wires.GetChild(i);
+            Wire w = wire.GetComponent<Wire>();
+            if (w.from == circuit && w.output == output) return true;
+        }
+        return false;
+    }
 
     public void MakeWire(Circuit from, int output, Circuit to, int input)
     {
@@ -71,5 +94,27 @@ public class LogicManager : MonoBehaviour
 
         wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
         wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
+    }
+
+    public void MakeCircuit(GameObject of, Vector3 at)
+    {
+        GameObject circuit = Instantiate(of, components);
+        circuit.transform.position = at;
+    }
+
+    public void RemoveCircuit(GameObject circuit)
+    {
+        Circuit c = circuit.GetComponent<Circuit>();
+
+        for (int i = 0; i < c.inputs.Count; i++)
+        {
+            if (ConnectedWiresOnInput(c, i)) return;
+        }
+        for (int o = 0; o < c.outputs.Count; o++)
+        {
+            if (ConnectedWiresOnOutput(c, o)) return;
+        }
+
+        Destroy(circuit);
     }
 }
