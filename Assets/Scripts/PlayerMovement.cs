@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
 {
 
     public CharacterController controller;
+    public Transform visual;
+    public Camera cam;
 
     public float speed = 12f;
     public float gravity = -9.81f;
@@ -39,5 +41,7 @@ public class PlayerMovement : MonoBehaviour
         velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
+
+        visual.rotation = cam.transform.rotation;
     }
 }
