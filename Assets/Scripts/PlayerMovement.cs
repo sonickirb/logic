@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
 
     public CharacterController controller;
@@ -20,9 +21,19 @@ public class PlayerMovement : MonoBehaviour
     Vector3 velocity;
     bool isGrounded;
 
+    void Start()
+    {
+        if (!IsOwner) return;
+
+        cam = Camera.main;
+        cam.GetComponent<MouseLook>().player = transform;
+    }
+
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner) return;
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0) 

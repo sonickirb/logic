@@ -27,8 +27,22 @@ public class MouseLook : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        player.Rotate(Vector3.up * mouseX);
-        transform.rotation = Quaternion.Euler(xRotation, player.rotation.eulerAngles.y, 0f);
-        transform.position = player.position + new Vector3(0f,eyeOffset,0f);
+        if (player != null)
+        {
+            player.Rotate(Vector3.up * mouseX);
+            transform.rotation = Quaternion.Euler(xRotation, player.rotation.eulerAngles.y, 0f);
+            transform.position = player.position + new Vector3(0f,eyeOffset,0f);
+        } else
+        {
+            float x = Input.GetAxis("Horizontal");
+            float z = Input.GetAxis("Vertical");
+
+            transform.Rotate(Vector3.up * mouseX);
+            transform.rotation = Quaternion.Euler(xRotation, transform.eulerAngles.y, 0f);
+
+            Vector3 move = transform.right * x + transform.forward * z;
+
+            transform.position += move * 10f * Time.deltaTime;
+        }
     }
 }
