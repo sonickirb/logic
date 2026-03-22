@@ -148,7 +148,6 @@ public class LogicManager : NetworkBehaviour
     {
         if (!IsServer)
         {
-            Debug.Log("AAAAHHH!!");
             MakeCircuitServerRpc(GetCircuitIDFromName(of.name), at);
             return null;
         }
@@ -161,6 +160,11 @@ public class LogicManager : NetworkBehaviour
 
     public void RemoveCircuit(GameObject circuit)
     {
+        if (!IsServer)
+        {
+            DeleteCircuitServerRpc(GetMyChildID(circuit.transform));
+            return;
+        }
         Circuit c = circuit.GetComponent<Circuit>();
 
         for (int i = 0; i < c.inputs.Count; i++)
@@ -172,7 +176,11 @@ public class LogicManager : NetworkBehaviour
             if (ConnectedWiresOnOutput(c, o)) return;
         }
 
+        int id = GetMyChildID(c.transform);
+
         Destroy(circuit);
+        
+        DeleteCircuitClientRpc(id);
     }
 
     public int GetCircuitIDFromName(string name)
@@ -185,17 +193,42 @@ public class LogicManager : NetworkBehaviour
         Debug.LogError("Circuit named \"" + name + "\" does not exist");
         return -1;
     }
-
-    [ServerRpc]
-    private void MakeCircuitServerRpc(int ID, Vector3 at)
+    public int GetMyChildID(Transform c)
     {
-        Debug.Log("Yo dude please make " + ID + " at " + at.ToString());
+        for (int i = 0; i < c.parent.childCount; i++)
+        {
+            if (c.parent.GetChild(i) == c) return i;
+        }
+        Debug.LogError("could not find child ID of " + c.name);
+        return -1;
     }
 
-    [ClientRpc]
+    [ServerRpc(RequireOwnership = false)]
+    private void MakeCircuitServerRpc(int ID, Vector3 at)
+    {
+        MakeCircuit(circuitPrefabs[ID].prefab, at);
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void DeleteCircuitServerRpc(int c)
+    {
+        RemoveCircuit(components.GetChild(c).gameObject);
+    }
+    
+
+    [ClientRpc(RequireOwnership = false)]
     private void MakeCircuitClientRpc(int ID, Vector3 at)
     {
-        
+        if (IsHost) return;
+        GameObject of = circuitPrefabs[ID].prefab;
+        GameObject circuit = Instantiate(of, components);
+        circuit.transform.position = at;
+        circuit.name = of.name;
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void DeleteCircuitClientRpc(int c)
+    {
+        if (IsHost) return;
+        Destroy(components.GetChild(c).gameObject);
     }
 
     [ClientRpc]
