@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -38,7 +39,11 @@ public class LogicManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!IsServer) return;
+        if (!IsServer)
+        {
+            Debug.Log("nuh uh uh");
+            return;
+        }
         // eventually we should do this in some kind of main-menu instead
         WorldData data = SaveSystem.LoadWorldData();
         if (data != null)
@@ -65,6 +70,9 @@ public class LogicManager : NetworkBehaviour
 
                 Wire wire = MakeWire(from, output, to, input);
             }
+        } else
+        {
+            Debug.LogWarning("no World data to load");
         }
     }
 
@@ -97,6 +105,8 @@ public class LogicManager : NetworkBehaviour
             }
 
             circuit.Tick();
+            
+            UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
         }
         for (int i = 0; i < wires.childCount; i++)
         {
@@ -131,8 +141,14 @@ public class LogicManager : NetworkBehaviour
 
     public Wire MakeWire(Circuit from, int output, Circuit to, int input)
     {
+        if (!IsServer)
+        {
+            MakeWireServerRpc(GetCircuitIDFromName(from.transform.name), output, GetCircuitIDFromName(to.transform.name), input);
+            return null;
+        }
         GameObject wire = Instantiate(wirePrefab, wires);
         Wire w = wire.AddComponent<Wire>();
+        w.ID = Random.Range(1000000, 9999999);
         w.from = from;
         w.to = to;
         w.output = output;
@@ -141,7 +157,21 @@ public class LogicManager : NetworkBehaviour
         wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
         wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
 
+        MakeWireClientRpc(w.ID, from.ID, output, to.ID, input);
+
         return w;
+    }
+
+    public void RemoveWire(GameObject wire)
+    {
+        int c = wire.GetComponent<Wire>().ID;
+        if (!IsServer)
+        {
+            DeleteWireServerRpc(c);
+            return;
+        }
+        Destroy(wire);
+        DeleteWireClientRpc(c);
     }
 
     public Circuit MakeCircuit(GameObject of, Vector3 at)
@@ -152,9 +182,10 @@ public class LogicManager : NetworkBehaviour
             return null;
         }
         GameObject circuit = Instantiate(of, components);
+        circuit.GetComponent<Circuit>().ID = Random.Range(1000000, 9999999);
         circuit.transform.position = at;
         circuit.name = of.name;
-        MakeCircuitClientRpc(GetCircuitIDFromName(circuit.name), at);
+        MakeCircuitClientRpc(circuit.GetComponent<Circuit>().ID, GetCircuitIDFromName(circuit.name), at);
         return circuit.GetComponent<Circuit>();
     }
 
@@ -162,7 +193,7 @@ public class LogicManager : NetworkBehaviour
     {
         if (!IsServer)
         {
-            DeleteCircuitServerRpc(GetMyChildID(circuit.transform));
+            DeleteCircuitServerRpc(circuit.GetComponent<Circuit>().ID);
             return;
         }
         Circuit c = circuit.GetComponent<Circuit>();
@@ -176,7 +207,7 @@ public class LogicManager : NetworkBehaviour
             if (ConnectedWiresOnOutput(c, o)) return;
         }
 
-        int id = GetMyChildID(c.transform);
+        int id = circuit.GetComponent<Circuit>().ID;
 
         Destroy(circuit);
         
@@ -193,14 +224,23 @@ public class LogicManager : NetworkBehaviour
         Debug.LogError("Circuit named \"" + name + "\" does not exist");
         return -1;
     }
-    public int GetMyChildID(Transform c)
+    public Transform GetCircuitFromInstanceID(int ID)
     {
-        for (int i = 0; i < c.parent.childCount; i++)
+        for (int i = 0; i < components.childCount; i++)
         {
-            if (c.parent.GetChild(i) == c) return i;
+            if (components.GetChild(i).GetComponent<Circuit>().ID == ID) return components.GetChild(i);
         }
-        Debug.LogError("could not find child ID of " + c.name);
-        return -1;
+        Debug.LogError("could not find circuit of instance id " + ID);
+        return null;
+    }
+    public Transform GetWireFromInstanceID(int ID)
+    {
+        for (int i = 0; i < wires.childCount; i++)
+        {
+            if (wires.GetChild(i).GetComponent<Wire>().ID == ID) return wires.GetChild(i);
+        }
+        Debug.LogError("could not find wire of instance id " + ID);
+        return null;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -211,16 +251,29 @@ public class LogicManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void DeleteCircuitServerRpc(int c)
     {
-        RemoveCircuit(components.GetChild(c).gameObject);
+        RemoveCircuit(GetCircuitFromInstanceID(c).gameObject);
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void MakeWireServerRpc(int fromID, int output, int toID, int input)
+    {
+        Circuit from = GetCircuitFromInstanceID(fromID).GetComponent<Circuit>();
+        Circuit to = GetCircuitFromInstanceID(toID).GetComponent<Circuit>();
+        MakeWire(from, output, to, input);
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void DeleteWireServerRpc(int w)
+    {
+        Destroy(GetWireFromInstanceID(w).gameObject);
     }
     
 
     [ClientRpc(RequireOwnership = false)]
-    private void MakeCircuitClientRpc(int ID, Vector3 at)
+    private void MakeCircuitClientRpc(int myID, int ID, Vector3 at)
     {
         if (IsHost) return;
         GameObject of = circuitPrefabs[ID].prefab;
         GameObject circuit = Instantiate(of, components);
+        circuit.GetComponent<Circuit>().ID = myID;
         circuit.transform.position = at;
         circuit.name = of.name;
     }
@@ -228,7 +281,40 @@ public class LogicManager : NetworkBehaviour
     private void DeleteCircuitClientRpc(int c)
     {
         if (IsHost) return;
-        Destroy(components.GetChild(c).gameObject);
+        Destroy(GetCircuitFromInstanceID(c).gameObject);
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void UpdateCircuitClientRpc(int c, bool[] inputs, bool[] outputs)
+    {
+        if (IsHost) return;
+        Circuit circuit = GetCircuitFromInstanceID(c).GetComponent<Circuit>();
+
+        circuit.inputs = inputs.ToList<bool>();
+        circuit.outputs = outputs.ToList<bool>();
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void MakeWireClientRpc(int myID, int fromID, int output, int toID, int input)
+    {
+        if (IsHost) return;
+        Circuit from = GetCircuitFromInstanceID(fromID).GetComponent<Circuit>();
+        Circuit to = GetCircuitFromInstanceID(toID).GetComponent<Circuit>();
+
+        GameObject wire = Instantiate(wirePrefab, wires);
+        Wire w = wire.AddComponent<Wire>();
+        w.ID = myID;
+        w.from = from;
+        w.to = to;
+        w.output = output;
+        w.input = input;
+
+        wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
+        wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void DeleteWireClientRpc(int w)
+    {
+        if (IsHost) return;
+        Destroy(GetWireFromInstanceID(w).gameObject);
     }
 
     [ClientRpc]

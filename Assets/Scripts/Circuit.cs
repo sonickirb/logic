@@ -5,6 +5,8 @@ using UnityEngine;
 public class Circuit : MonoBehaviour
 {
 
+    public int ID;
+
     public List<bool> inputs;
     public List<bool> outputs;
     public string scriptID;

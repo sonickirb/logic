@@ -104,7 +104,7 @@ public class Editing : MonoBehaviour
         {
             if (lookingAtWire)
             {
-                Destroy(lookingAtWire.gameObject);
+                LogicManager.Instance.RemoveWire(lookingAtWire.gameObject);
             } else if (lookingAtCircuit)
             {
                 LogicManager.Instance.RemoveCircuit(lookingAtCircuit.gameObject);
