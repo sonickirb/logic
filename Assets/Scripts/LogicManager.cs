@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [System.Serializable]
@@ -9,7 +10,7 @@ public struct ComponentData
     public GameObject prefab;
 }
 
-public class LogicManager : MonoBehaviour
+public class LogicManager : NetworkBehaviour
 {
 
     public static LogicManager Instance;
@@ -37,6 +38,7 @@ public class LogicManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (!IsServer) return;
         // eventually we should do this in some kind of main-menu instead
         WorldData data = SaveSystem.LoadWorldData();
         if (data != null)
@@ -68,19 +70,22 @@ public class LogicManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I)) autoTick = !autoTick;
+        if (!IsServer) return;
         if (Input.GetKeyDown(KeyCode.P) && !autoTick) Tick();
+        if (Input.GetKeyDown(KeyCode.I)) autoTick = !autoTick;
         if (Input.GetKeyDown(KeyCode.O)) SaveSystem.SaveWorldData();
     }
 
     // FixedUpdate is called every logic tick
     void FixedUpdate()
     {
+        if (!IsServer) return;
         if (autoTick) Tick();
     }
 
     public void Tick()
     {
+        if (!IsServer) return;
         for (int i = 0; i < components.childCount; i++)
         {
             Transform component = components.GetChild(i);
@@ -141,9 +146,16 @@ public class LogicManager : MonoBehaviour
 
     public Circuit MakeCircuit(GameObject of, Vector3 at)
     {
+        if (!IsServer)
+        {
+            Debug.Log("AAAAHHH!!");
+            MakeCircuitServerRpc(GetCircuitIDFromName(of.name), at);
+            return null;
+        }
         GameObject circuit = Instantiate(of, components);
         circuit.transform.position = at;
         circuit.name = of.name;
+        MakeCircuitClientRpc(GetCircuitIDFromName(circuit.name), at);
         return circuit.GetComponent<Circuit>();
     }
 
@@ -172,5 +184,22 @@ public class LogicManager : MonoBehaviour
         }
         Debug.LogError("Circuit named \"" + name + "\" does not exist");
         return -1;
+    }
+
+    [ServerRpc]
+    private void MakeCircuitServerRpc(int ID, Vector3 at)
+    {
+        Debug.Log("Yo dude please make " + ID + " at " + at.ToString());
+    }
+
+    [ClientRpc]
+    private void MakeCircuitClientRpc(int ID, Vector3 at)
+    {
+        
+    }
+
+    [ClientRpc]
+    private void TestClientRpc() {
+        Debug.Log("TestClientRpc");
     }
 }
