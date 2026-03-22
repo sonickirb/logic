@@ -16,16 +16,15 @@ public class Circuit : MonoBehaviour
     List<GameObject> nodeInputs = new List<GameObject>();
     List<GameObject> nodeOutputs = new List<GameObject>();
 
-    void Start()
-    {
-        script = LogicManager.Instance.transform.Find(scriptID).GetComponent<CircuitDerive>();
-
-        nodeInputsParent = transform.Find("Inputs");
-        nodeOutputsParent = transform.Find("Outputs");
-    }
-
     void Update()
     {
+        UpdateNodes();
+    }
+
+    public void UpdateNodes()
+    {
+        if (nodeInputsParent == null)  nodeInputsParent  = transform.Find("Inputs");
+        if (nodeOutputsParent == null) nodeOutputsParent = transform.Find("Outputs");
         while (nodeInputs.Count < inputs.Count)
         {
             GameObject node = Instantiate(LogicManager.Instance.nodePrefab, nodeInputsParent);
@@ -63,6 +62,10 @@ public class Circuit : MonoBehaviour
 
     public void Tick()
     {
+        if (script == null)
+        {
+            script = LogicManager.Instance.transform.Find(scriptID).GetComponent<CircuitDerive>();
+        }
         bool[] got = script.GetOutputs(inputs);
         for (int i = 0; i < got.Length; i++)
         {

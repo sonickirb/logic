@@ -6,7 +6,7 @@ public class C_NAND : CircuitDerive
     {
         bool[] outputs = new bool[1];
 
-        outputs[0] = !(inputs[0] == inputs[1]);
+        outputs[0] = !(inputs[0] && inputs[1]);
 
         return outputs;
     }
