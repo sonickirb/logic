@@ -143,7 +143,7 @@ public class LogicManager : NetworkBehaviour
     {
         if (!IsServer)
         {
-            MakeWireServerRpc(GetCircuitIDFromName(from.transform.name), output, GetCircuitIDFromName(to.transform.name), input);
+            MakeWireServerRpc(from.ID, output, to.ID, input);
             return null;
         }
         GameObject wire = Instantiate(wirePrefab, wires);
@@ -263,7 +263,7 @@ public class LogicManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void DeleteWireServerRpc(int w)
     {
-        Destroy(GetWireFromInstanceID(w).gameObject);
+        RemoveWire(GetWireFromInstanceID(w).gameObject);
     }
     
 
