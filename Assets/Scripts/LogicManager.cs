@@ -26,6 +26,8 @@ public class LogicManager : NetworkBehaviour
     public Material wireNoNo;
     public Material select;
     public Material nodeOff;
+    public Material pixelOff;
+    public Material pixelOn;
 
     public bool autoTick;
 

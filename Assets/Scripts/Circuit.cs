@@ -69,6 +69,7 @@ public class Circuit : MonoBehaviour
             script = LogicManager.Instance.transform.Find(scriptID).GetComponent<CircuitDerive>();
         }
         if (transform.Find("Button")) transform.Find("Button").GetComponent<LogicButton>().Tick();
+        if (transform.Find("Pixel")) transform.Find("Pixel").GetComponent<MeshRenderer>().material = inputs[0] ? LogicManager.Instance.pixelOn : LogicManager.Instance.pixelOff;
         bool[] got = script.GetOutputs(inputs);
         for (int i = 0; i < got.Length; i++)
         {

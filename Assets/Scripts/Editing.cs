@@ -145,6 +145,7 @@ public class Editing : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha7)) placing = inventory[6];
             if (Input.GetKeyDown(KeyCode.Alpha8)) placing = inventory[7];
             if (Input.GetKeyDown(KeyCode.Alpha9)) placing = inventory[8];
+            if (Input.GetKeyDown(KeyCode.Alpha0)) placing = inventory[9];
         }
 
         place.gameObject.SetActive(placing != null);
