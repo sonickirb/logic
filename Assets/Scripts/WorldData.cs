@@ -57,7 +57,7 @@ public class WorldData
             }
             for (int o = 0; o < comp.outputs.Count; o++)
             {
-                inputs.Add(comp.outputs[o]);
+                outputs.Add(comp.outputs[o]);
             }
         }
 
