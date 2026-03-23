@@ -131,7 +131,7 @@ public class LogicManager : NetworkBehaviour
             wireInputs.Add(wire.input);
         }
 
-        UpdateWorldClientRpc(circuitIDs.ToArray(), circuitInstanceIDs.ToArray(), circuitPositions.ToArray(), wireIDs.ToArray(), wireFromIDs.ToArray(), wireOutputs.ToArray(), 
+        UpdateWorldClientRpc(client, circuitIDs.ToArray(), circuitInstanceIDs.ToArray(), circuitPositions.ToArray(), wireIDs.ToArray(), wireFromIDs.ToArray(), wireOutputs.ToArray(), 
             wireToIDs.ToArray(), wireInputs.ToArray(), inputCounts.ToArray(), inputs.ToArray(), outputCounts.ToArray(), outputs.ToArray());
     }
 
@@ -486,10 +486,10 @@ public class LogicManager : NetworkBehaviour
         Destroy(GetWireFromInstanceID(w).gameObject);
     }
     [ClientRpc(RequireOwnership = false)]
-    private void UpdateWorldClientRpc(int[] circuitIDs, int[] circuitInstanceIDs, Vector3[] circuitPositions, int[] wireIDs, 
+    private void UpdateWorldClientRpc(ulong client, int[] circuitIDs, int[] circuitInstanceIDs, Vector3[] circuitPositions, int[] wireIDs, 
         int[] wireFromIDs, int[] wireOutputs, int[] wireToIDs, int[] wireInputs, int[] inputCounts, bool[] inputs, int[] outputCounts, bool[] outputs)
     {
-        if (IsHost) return;
+        if (IsHost || client != NetworkManager.Singleton.LocalClientId) return;
         int inputIndex = 0;
         int outputIndex = 0;
         for (int i = 0; i < circuitIDs.Length; i++)
