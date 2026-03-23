@@ -1405,6 +1405,7 @@ MonoBehaviour:
   - name: Pixel
     prefab: {fileID: 7961296223909989401, guid: 0aaf101a5b878094bbb8dce18fe81066,
       type: 3}
+  loading: 1
 --- !u!114 &1295467715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2254,14 +2255,14 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1757472273}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 2c67f17f3e433c14a9bd0d191db7900f, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 1c30dd9a89188ca46935e6067bef65ce, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.299
+  m_Volume: 0.5
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
