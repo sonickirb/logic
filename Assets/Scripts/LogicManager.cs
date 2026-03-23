@@ -187,7 +187,7 @@ public class LogicManager : NetworkBehaviour
             line.material = w.from.outputs[w.output] ? nodeOn : nodeOff;
         }
 
-        UpdateCircuitsClientRpc(networkIDs, networkOutputs, networkInputs);
+        UpdateCircuitsClientRpc(networkIDs, networkInputs, networkOutputs);
     }
 
     public List<Wire> ConnectedWiresOnInput(Circuit circuit, int input)
@@ -415,8 +415,8 @@ public class LogicManager : NetworkBehaviour
             bool[] outputs = cOutputs[j];
             Circuit circuit = GetCircuitFromInstanceID(c).GetComponent<Circuit>();
 
-            circuit.inputs = inputs.ToList<bool>();
-            circuit.outputs = outputs.ToList<bool>();
+            circuit.inputs = inputs.ToList();
+            circuit.outputs = outputs.ToList();
 
             circuit.Extra();
 
@@ -470,6 +470,7 @@ public class LogicManager : NetworkBehaviour
     private void UpdateWorldClientRpc(int[] circuitIDs, int[] circuitInstanceIDs, Vector3[] circuitPositions, int[] wireIDs, 
         int[] wireFromIDs, int[] wireOutputs, int[] wireToIDs, int[] wireInputs, int[] inputCounts, bool[] inputs, int[] outputCounts, bool[] outputs)
     {
+        if (IsHost) return;
         int inputIndex = 0;
         int outputIndex = 0;
         for (int i = 0; i < circuitIDs.Length; i++)
