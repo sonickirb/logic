@@ -57,12 +57,12 @@ public class LogicManager : NetworkBehaviour
                 circuitIndex[i].Tick();
                 circuitIndex[i].UpdateNodes();
                 
-                for (int j = 0; j < data.compInputCount.Length; j++)
+                for (int j = 0; j < data.compInputCount[i]; j++)
                 {
                     circuitIndex[i].inputs.Add(data.inputStates[inputs]);
                     inputs += 1;
                 }
-                for (int j = 0; j < data.compOutputCount.Length; j++)
+                for (int j = 0; j < data.compOutputCount[i]; j++)
                 {
                     circuitIndex[i].outputs.Add(data.outputStates[outputs]);
                     outputs += 1;
