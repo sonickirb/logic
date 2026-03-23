@@ -138,6 +138,8 @@ public class LogicManager : NetworkBehaviour
             circuit.Tick();
             
             UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
+
+            circuit.Extra();
         }
         for (int i = 0; i < wires.childCount; i++)
         {
@@ -339,6 +341,8 @@ public class LogicManager : NetworkBehaviour
 
         circuit.inputs = inputs.ToList<bool>();
         circuit.outputs = outputs.ToList<bool>();
+
+        circuit.Extra();
 
         for (int i = 0; i < circuit.inputs.Count; i++)
         {
