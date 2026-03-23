@@ -92,19 +92,44 @@ public class LogicManager : NetworkBehaviour
     public void OnClientJoined(ulong client)
     {
         if (IsHost) return;
+
+        List<int> circuitIDs = new List<int>();
+        List<int> circuitInstanceIDs = new List<int>();
+        List<Vector3> circuitPositions = new List<Vector3>();
+        List<int> wireIDs = new List<int>();
+        List<int> wireFromIDs = new List<int>();
+        List<int> wireOutputs = new List<int>();
+        List<int> wireToIDs = new List<int>();
+        List<int> wireInputs = new List<int>();
+        List<int> inputCounts = new List<int>();
+        List<bool> inputs = new List<bool>();
+        List<int> outputCounts = new List<int>();
+        List<bool> outputs = new List<bool>();
+
         for (int i = 0; i < components.childCount; i++)
         {
             Circuit circuit = components.GetChild(i).GetComponent<Circuit>();
 
-            MakeCircuitClientRpc(circuit.ID, GetCircuitIDFromName(circuit.transform.name), circuit.transform.position);
-            UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
+            circuitIDs.Add(GetCircuitIDFromName(circuit.transform.name));
+            circuitInstanceIDs.Add(circuit.ID);
+            inputCounts.Add(circuit.inputs.Count);
+            for (int j = 0; j < circuit.inputs.Count; j++) inputs.Add(circuit.inputs[j]);
+            outputCounts.Add(circuit.outputs.Count);
+            for (int j = 0; j < circuit.outputs.Count; j++) outputs.Add(circuit.outputs[j]);
         }
         for (int i = 0; i < wires.childCount; i++)
         {
             Wire wire = wires.GetChild(i).GetComponent<Wire>();
 
-            MakeWireClientRpc(wire.ID, wire.from.ID, wire.output, wire.to.ID, wire.input);
+            wireIDs.Add(wire.ID);
+            wireFromIDs.Add(wire.from.ID);
+            wireOutputs.Add(wire.output);
+            wireToIDs.Add(wire.to.ID);
+            wireInputs.Add(wire.input);
         }
+
+        UpdateWorldClientRpc(circuitIDs.ToArray(), circuitInstanceIDs.ToArray(), circuitPositions.ToArray(), wireIDs.ToArray(), wireFromIDs.ToArray(), wireOutputs.ToArray(), 
+            wireToIDs.ToArray(), wireInputs.ToArray(), inputCounts.ToArray(), inputs.ToArray(), outputCounts.ToArray(), outputs.ToArray());
     }
 
     void Update()
@@ -388,6 +413,61 @@ public class LogicManager : NetworkBehaviour
     {
         if (IsHost) return;
         Destroy(GetWireFromInstanceID(w).gameObject);
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void UpdateWorldClientRpc(int[] circuitIDs, int[] circuitInstanceIDs, Vector3[] circuitPositions, int[] wireIDs, 
+        int[] wireFromIDs, int[] wireOutputs, int[] wireToIDs, int[] wireInputs, int[] inputCounts, bool[] inputs, int[] outputCounts, bool[] outputs)
+    {
+        int inputIndex = 0;
+        int outputIndex = 0;
+        for (int i = 0; i < circuitIDs.Length; i++)
+        {
+            int ID = circuitIDs[i];
+            int myID = circuitInstanceIDs[i];
+            Vector3 at = circuitPositions[i];
+            GameObject of = circuitPrefabs[ID].prefab;
+            GameObject circuit = Instantiate(of, components);
+            circuit.GetComponent<Circuit>().ID = myID;
+            circuit.transform.position = at;
+            circuit.name = of.name;
+
+            Circuit c = circuit.GetComponent<Circuit>();
+
+            for (int j = 0; j < inputCounts[i]; j++)
+            {
+                while (c.inputs.Count < inputCounts[i]) c.inputs.Add(false);
+                c.inputs[j] = inputs[inputIndex];
+                inputIndex++;
+            }
+            for (int j = 0; j < outputCounts[i]; j++)
+            {
+                while (c.outputs.Count < outputCounts[i]) c.outputs.Add(false);
+                c.outputs[j] = outputs[outputIndex];
+                outputIndex++;
+            }
+        }
+        for (int i = 0; i < wireIDs.Length; i++)
+        {
+            int myID = wireIDs[i];
+            int fromID = wireFromIDs[i];
+            int toID = wireToIDs[i];
+            int input = wireInputs[i];
+            int output = wireOutputs[i];
+
+            Circuit from = GetCircuitFromInstanceID(fromID).GetComponent<Circuit>();
+            Circuit to = GetCircuitFromInstanceID(toID).GetComponent<Circuit>();
+
+            GameObject wire = Instantiate(wirePrefab, wires);
+            Wire w = wire.AddComponent<Wire>();
+            w.ID = myID;
+            w.from = from;
+            w.to = to;
+            w.output = output;
+            w.input = input;
+
+            wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
+            wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
+        }
     }
 
     [ClientRpc]
