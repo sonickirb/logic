@@ -47,6 +47,8 @@ public class LogicManager : NetworkBehaviour
         if (data != null)
         {
             Circuit[] circuitIndex = new Circuit[data.components.Length];
+            int inputs = 0;
+            int outputs = 0;
             for (int i = 0; i < data.components.Length; i++)
             {
                 // to give you a POSITION at THIS JOB youd have to SLAVE AWAY for ONE DOLLAR AN HOUR
@@ -54,6 +56,17 @@ public class LogicManager : NetworkBehaviour
                 circuitIndex[i] = MakeCircuit(circuitPrefabs[data.components[i]].prefab, position);
                 circuitIndex[i].Tick();
                 circuitIndex[i].UpdateNodes();
+                
+                for (int j = 0; j < data.compInputCount.Length; j++)
+                {
+                    circuitIndex[i].inputs.Add(data.inputStates[inputs]);
+                    inputs += 1;
+                }
+                for (int j = 0; j < data.compOutputCount.Length; j++)
+                {
+                    circuitIndex[i].outputs.Add(data.outputStates[outputs]);
+                    outputs += 1;
+                }
             }
             foreach (Circuit c in circuitIndex) {
                 c.Tick();

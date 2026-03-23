@@ -13,6 +13,10 @@ public class WorldData
     public int[] connectionsTo;
     public int[] output;
     public int[] input;
+    public bool[] inputStates;
+    public bool[] outputStates;
+    public int[] compInputCount;
+    public int[] compOutputCount;
 
     public WorldData()
     {
@@ -25,6 +29,12 @@ public class WorldData
 
         Dictionary<Transform, int> circuitIndex = new Dictionary<Transform, int>();
 
+        List<bool> inputs = new List<bool>();
+        List<bool> outputs = new List<bool>();
+
+        compInputCount = new int[LogicManager.Instance.components.childCount];
+        compOutputCount = new int[LogicManager.Instance.components.childCount];
+
         for (int c = 0; c < LogicManager.Instance.components.childCount; c++)
         {
             Transform circuit = LogicManager.Instance.components.GetChild(c);
@@ -35,7 +45,24 @@ public class WorldData
             positionZ[c] = circuit.position.z;
             
             circuitIndex.Add(circuit, c);
+
+            Circuit comp = circuit.GetComponent<Circuit>();
+
+            compInputCount[c] = comp.inputs.Count;
+            compOutputCount[c] = comp.outputs.Count;
+
+            for (int i = 0; i < comp.inputs.Count; i++)
+            {
+                inputs.Add(comp.inputs[i]);
+            }
+            for (int o = 0; o < comp.outputs.Count; o++)
+            {
+                inputs.Add(comp.outputs[o]);
+            }
         }
+
+        inputStates = inputs.ToArray();
+        outputStates = outputs.ToArray();
 
         connectionsFrom = new int[LogicManager.Instance.wires.childCount];
         connectionsTo   = new int[LogicManager.Instance.wires.childCount];
