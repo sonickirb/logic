@@ -33,6 +33,8 @@ public class LogicManager : NetworkBehaviour
 
     public List<ComponentData> circuitPrefabs;
 
+    public bool loading = true;
+
     void Awake()
     {
         Instance = this;
@@ -112,6 +114,7 @@ public class LogicManager : NetworkBehaviour
 
             circuitIDs.Add(GetCircuitIDFromName(circuit.transform.name));
             circuitInstanceIDs.Add(circuit.ID);
+            circuitPositions.Add(circuit.transform.position);
             inputCounts.Add(circuit.inputs.Count);
             for (int j = 0; j < circuit.inputs.Count; j++) inputs.Add(circuit.inputs[j]);
             outputCounts.Add(circuit.outputs.Count);
@@ -135,6 +138,7 @@ public class LogicManager : NetworkBehaviour
     void Update()
     {
         if (!IsServer) return;
+        loading = false;
         if (Input.GetKeyDown(KeyCode.P) && !autoTick) Tick();
         if (Input.GetKeyDown(KeyCode.I)) autoTick = !autoTick;
         if (Input.GetKeyDown(KeyCode.O)) SaveSystem.SaveWorldData();
@@ -150,6 +154,11 @@ public class LogicManager : NetworkBehaviour
     public void Tick()
     {
         if (!IsServer) return;
+
+        int[] networkIDs = new int[components.childCount];
+        bool[][] networkInputs = new bool[components.childCount][];
+        bool[][] networkOutputs = new bool[components.childCount][];
+
         for (int i = 0; i < components.childCount; i++)
         {
             Transform component = components.GetChild(i);
@@ -162,7 +171,10 @@ public class LogicManager : NetworkBehaviour
 
             circuit.Tick();
             
-            UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
+            //UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
+            networkIDs[i] = circuit.ID;
+            networkInputs[i] = circuit.inputs.ToArray();
+            networkOutputs[i] = circuit.outputs.ToArray();
 
             circuit.Extra();
         }
@@ -174,6 +186,8 @@ public class LogicManager : NetworkBehaviour
             LineRenderer line = wire.GetComponent<LineRenderer>();
             line.material = w.from.outputs[w.output] ? nodeOn : nodeOff;
         }
+
+        UpdateCircuitsClientRpc(networkIDs, networkOutputs, networkInputs);
     }
 
     public List<Wire> ConnectedWiresOnInput(Circuit circuit, int input)
@@ -345,7 +359,7 @@ public class LogicManager : NetworkBehaviour
     [ClientRpc(RequireOwnership = false)]
     private void MakeCircuitClientRpc(int myID, int ID, Vector3 at)
     {
-        if (IsHost) return;
+        if (IsHost || loading) return;
         GameObject of = circuitPrefabs[ID].prefab;
         GameObject circuit = Instantiate(of, components);
         circuit.GetComponent<Circuit>().ID = myID;
@@ -355,13 +369,13 @@ public class LogicManager : NetworkBehaviour
     [ClientRpc(RequireOwnership = false)]
     private void DeleteCircuitClientRpc(int c)
     {
-        if (IsHost) return;
+        if (IsHost || loading) return;
         Destroy(GetCircuitFromInstanceID(c).gameObject);
     }
     [ClientRpc(RequireOwnership = false)]
     private void UpdateCircuitClientRpc(int c, bool[] inputs, bool[] outputs)
     {
-        if (IsHost) return;
+        if (IsHost || loading) return;
         Circuit circuit = GetCircuitFromInstanceID(c).GetComponent<Circuit>();
 
         circuit.inputs = inputs.ToList<bool>();
@@ -391,9 +405,47 @@ public class LogicManager : NetworkBehaviour
         }
     }
     [ClientRpc(RequireOwnership = false)]
+    private void UpdateCircuitsClientRpc(int[] IDs, bool[][] cInputs, bool[][] cOutputs)
+    {
+        if (IsHost || loading) return;
+        for (int j = 0; j < IDs.Length; j++)
+        {
+            int c = IDs[j];
+            bool[] inputs = cInputs[j];
+            bool[] outputs = cOutputs[j];
+            Circuit circuit = GetCircuitFromInstanceID(c).GetComponent<Circuit>();
+
+            circuit.inputs = inputs.ToList<bool>();
+            circuit.outputs = outputs.ToList<bool>();
+
+            circuit.Extra();
+
+            for (int i = 0; i < circuit.inputs.Count; i++)
+            {
+                List<Wire> connected = ConnectedWiresOnInput(circuit, i);
+                for (int w = 0; w < connected.Count; w++)
+                {
+                    Wire wire = connected[w];
+                    LineRenderer line = wire.GetComponent<LineRenderer>();
+                    line.material = circuit.inputs[i] ? nodeOn : nodeOff;
+                }
+            }
+            for (int o = 0; o < circuit.outputs.Count; o++)
+            {
+                List<Wire> connected = ConnectedWiresOnInput(circuit, o);
+                for (int w = 0; w < connected.Count; w++)
+                {
+                    Wire wire = connected[w];
+                    LineRenderer line = wire.GetComponent<LineRenderer>();
+                    line.material = circuit.outputs[o] ? nodeOn : nodeOff;
+                }
+            }
+        }
+    }
+    [ClientRpc(RequireOwnership = false)]
     private void MakeWireClientRpc(int myID, int fromID, int output, int toID, int input)
     {
-        if (IsHost) return;
+        if (IsHost || loading) return;
         Circuit from = GetCircuitFromInstanceID(fromID).GetComponent<Circuit>();
         Circuit to = GetCircuitFromInstanceID(toID).GetComponent<Circuit>();
 
@@ -411,7 +463,7 @@ public class LogicManager : NetworkBehaviour
     [ClientRpc(RequireOwnership = false)]
     private void DeleteWireClientRpc(int w)
     {
-        if (IsHost) return;
+        if (IsHost || loading) return;
         Destroy(GetWireFromInstanceID(w).gameObject);
     }
     [ClientRpc(RequireOwnership = false)]
@@ -445,6 +497,8 @@ public class LogicManager : NetworkBehaviour
                 c.outputs[j] = outputs[outputIndex];
                 outputIndex++;
             }
+
+            c.UpdateNodes();
         }
         for (int i = 0; i < wireIDs.Length; i++)
         {
@@ -468,6 +522,7 @@ public class LogicManager : NetworkBehaviour
             wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
             wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
         }
+        loading = false;
     }
 
     [ClientRpc]
