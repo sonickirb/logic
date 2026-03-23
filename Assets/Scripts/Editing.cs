@@ -27,6 +27,8 @@ public class Editing : MonoBehaviour
 
     public List<GameObject> inventory;
 
+    Transform lookingAtButton;
+
     public AudioSource circuitSFX;
     public AudioSource wireSFX;
 
@@ -69,6 +71,11 @@ public class Editing : MonoBehaviour
             lookingAtCircuit = result.collider.transform;
         } else lookingAtCircuit = null;
 
+        if (hit && result.collider.tag == "Button" && !lookingAtNode && !lookingAtCircuit && !makingWire && !placing)
+        {
+            lookingAtButton = result.collider.transform;
+        } else lookingAtButton = null;
+
         nodeSelector.gameObject.SetActive(lookingAtNode != null);
         if (lookingAtNode) nodeSelector.position = lookingAtNode.position;
 
@@ -82,7 +89,7 @@ public class Editing : MonoBehaviour
                 wireMaking.SetPosition(0, firstNode.position);
                 wireSFX.Play();
             }
-            else if (makingWire && lookingAtNode)
+            else if (makingWire && lookingAtNode && lookingAtNode.parent.name != "Outputs" && lookingAtNode.parent.parent.name != "Button")
             {
                 Circuit from = firstNode.parent.parent.GetComponent<Circuit>();
                 Circuit to = lookingAtNode.parent.parent.GetComponent<Circuit>();
@@ -98,6 +105,9 @@ public class Editing : MonoBehaviour
                 LogicManager.Instance.MakeCircuit(placing, place.position);
                 placing = null;
                 circuitSFX.Play();
+            } else if (lookingAtButton)
+            {
+                LogicManager.Instance.PressButton(lookingAtButton.GetComponent<LogicButton>());
             }
         }
         if (Input.GetMouseButtonDown(1))
@@ -134,6 +144,7 @@ public class Editing : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha6)) placing = inventory[5];
             if (Input.GetKeyDown(KeyCode.Alpha7)) placing = inventory[6];
             if (Input.GetKeyDown(KeyCode.Alpha8)) placing = inventory[7];
+            if (Input.GetKeyDown(KeyCode.Alpha9)) placing = inventory[8];
         }
 
         place.gameObject.SetActive(placing != null);

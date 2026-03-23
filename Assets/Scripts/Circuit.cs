@@ -68,6 +68,7 @@ public class Circuit : MonoBehaviour
         {
             script = LogicManager.Instance.transform.Find(scriptID).GetComponent<CircuitDerive>();
         }
+        if (transform.Find("Button")) transform.Find("Button").GetComponent<LogicButton>().Tick();
         bool[] got = script.GetOutputs(inputs);
         for (int i = 0; i < got.Length; i++)
         {

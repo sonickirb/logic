@@ -1352,6 +1352,9 @@ MonoBehaviour:
   - name: XNOR
     prefab: {fileID: 5745846387792185913, guid: b9aaa595d4645104aa1800f92a7511b1,
       type: 3}
+  - name: Button
+    prefab: {fileID: 7961296223909989401, guid: 001e4cacec50cef42b98a3a23a61420e,
+      type: 3}
 --- !u!114 &1295467715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1907,6 +1910,7 @@ MonoBehaviour:
   - {fileID: 5745846387792185913, guid: eee1c031f3eca954383bff78ae9641fb, type: 3}
   - {fileID: 5745846387792185913, guid: e62ea4db50127c0408800a689bb9b6d9, type: 3}
   - {fileID: 5745846387792185913, guid: b9aaa595d4645104aa1800f92a7511b1, type: 3}
+  - {fileID: 7961296223909989401, guid: 001e4cacec50cef42b98a3a23a61420e, type: 3}
   circuitSFX: {fileID: 1809986782}
   wireSFX: {fileID: 807132049}
 --- !u!1 &1570542072
@@ -2199,7 +2203,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1757472273}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 2c67f17f3e433c14a9bd0d191db7900f, type: 3}

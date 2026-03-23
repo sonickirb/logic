@@ -34,17 +34,12 @@ public class LogicManager : NetworkBehaviour
     void Awake()
     {
         Instance = this;
+
+        NetworkManager.Singleton.OnServerStarted += LoadWorld;
     }
-    
-    // Start is called before the first frame update
-    void Start()
+
+    public void LoadWorld()
     {
-        if (!IsServer)
-        {
-            Debug.Log("nuh uh uh");
-            return;
-        }
-        // eventually we should do this in some kind of main-menu instead
         WorldData data = SaveSystem.LoadWorldData();
         if (data != null)
         {
@@ -212,6 +207,11 @@ public class LogicManager : NetworkBehaviour
         Destroy(circuit);
         
         DeleteCircuitClientRpc(id);
+    }
+
+    public void PressButton(LogicButton button)
+    {
+        button.OnPress();
     }
 
     public int GetCircuitIDFromName(string name)
