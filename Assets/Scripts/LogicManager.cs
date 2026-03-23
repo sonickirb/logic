@@ -156,8 +156,10 @@ public class LogicManager : NetworkBehaviour
         if (!IsServer) return;
 
         int[] networkIDs = new int[components.childCount];
-        bool[][] networkInputs = new bool[components.childCount][];
-        bool[][] networkOutputs = new bool[components.childCount][];
+        List<bool> networkInputs = new List<bool>();
+        List<bool> networkOutputs = new List<bool>();
+        int[] networkInputCount = new int[components.childCount];
+        int[] networkOutputCount = new int[components.childCount];
 
         for (int i = 0; i < components.childCount; i++)
         {
@@ -173,8 +175,11 @@ public class LogicManager : NetworkBehaviour
             
             //UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
             networkIDs[i] = circuit.ID;
-            networkInputs[i] = circuit.inputs.ToArray();
-            networkOutputs[i] = circuit.outputs.ToArray();
+            networkInputCount[i] = circuit.inputs.Count;
+            networkOutputCount[i] = circuit.outputs.Count;
+            
+            for (int j = 0; j < circuit.inputs.Count; j++) networkInputs.Add(circuit.inputs[j]);
+            for (int j = 0; j < circuit.outputs.Count; j++) networkOutputs.Add(circuit.outputs[j]);
 
             circuit.Extra();
         }
@@ -187,7 +192,7 @@ public class LogicManager : NetworkBehaviour
             line.material = w.from.outputs[w.output] ? nodeOn : nodeOff;
         }
 
-        UpdateCircuitsClientRpc(networkIDs, networkInputs, networkOutputs);
+        UpdateCircuitsClientRpc(networkIDs, networkInputCount, networkOutputCount, networkInputs.ToArray(), networkOutputs.ToArray());
     }
 
     public List<Wire> ConnectedWiresOnInput(Circuit circuit, int input)
@@ -405,14 +410,28 @@ public class LogicManager : NetworkBehaviour
         }
     }
     [ClientRpc(RequireOwnership = false)]
-    private void UpdateCircuitsClientRpc(int[] IDs, bool[][] cInputs, bool[][] cOutputs)
+    private void UpdateCircuitsClientRpc(int[] IDs, int[] inputCounts, int[] outputCounts, bool[] cInputs, bool[] cOutputs)
     {
         if (IsHost || loading) return;
+        int inputIndex = 0;
+        int outputIndex = 0;
         for (int j = 0; j < IDs.Length; j++)
         {
             int c = IDs[j];
-            bool[] inputs = cInputs[j];
-            bool[] outputs = cOutputs[j];
+            bool[] inputs = new bool[inputCounts[j]];
+            bool[] outputs = new bool[outputCounts[j]];
+
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                inputs[i] = cInputs[inputIndex];
+                inputIndex++;
+            }
+            for (int i = 0; i < outputs.Length; i++)
+            {
+                outputs[i] = cOutputs[outputIndex];
+                outputIndex++;
+            }
+
             Circuit circuit = GetCircuitFromInstanceID(c).GetComponent<Circuit>();
 
             circuit.inputs = inputs.ToList();
