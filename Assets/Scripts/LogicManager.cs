@@ -35,6 +35,7 @@ public class LogicManager : NetworkBehaviour
     {
         Instance = this;
 
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientJoined;
         NetworkManager.Singleton.OnServerStarted += LoadWorld;
     }
 
@@ -71,6 +72,24 @@ public class LogicManager : NetworkBehaviour
         }
     }
 
+    public void OnClientJoined(ulong client)
+    {
+        if (IsHost) return;
+        for (int i = 0; i < components.childCount; i++)
+        {
+            Circuit circuit = components.GetChild(i).GetComponent<Circuit>();
+
+            MakeCircuitClientRpc(circuit.ID, GetCircuitIDFromName(circuit.transform.name), circuit.transform.position);
+            UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
+        }
+        for (int i = 0; i < wires.childCount; i++)
+        {
+            Wire wire = wires.GetChild(i).GetComponent<Wire>();
+
+            MakeWireClientRpc(wire.ID, wire.from.ID, wire.output, wire.to.ID, wire.input);
+        }
+    }
+
     void Update()
     {
         if (!IsServer) return;
@@ -96,7 +115,7 @@ public class LogicManager : NetworkBehaviour
 
             for (int n = 0; n < circuit.inputs.Count; n++)
             {
-                if (!ConnectedWiresOnInput(circuit, n)) circuit.inputs[n] = false;
+                if (ConnectedWiresOnInput(circuit, n).Count < 1) circuit.inputs[n] = false;
             }
 
             circuit.Tick();
@@ -113,25 +132,27 @@ public class LogicManager : NetworkBehaviour
         }
     }
 
-    public bool ConnectedWiresOnInput(Circuit circuit, int input)
+    public List<Wire> ConnectedWiresOnInput(Circuit circuit, int input)
     {
+        List<Wire> connectedWires = new List<Wire>();
         for (int i = 0; i < wires.childCount; i++)
         {
             Transform wire = wires.GetChild(i);
             Wire w = wire.GetComponent<Wire>();
-            if (w.to == circuit && w.input == input) return true;
+            if (w.to == circuit && w.input == input) connectedWires.Add(w);
         }
-        return false;
+        return connectedWires;
     }
-    public bool ConnectedWiresOnOutput(Circuit circuit, int output)
+    public List<Wire> ConnectedWiresOnOutput(Circuit circuit, int output)
     {
+        List<Wire> connectedWires = new List<Wire>();
         for (int i = 0; i < wires.childCount; i++)
         {
             Transform wire = wires.GetChild(i);
             Wire w = wire.GetComponent<Wire>();
-            if (w.from == circuit && w.output == output) return true;
+            if (w.from == circuit && w.output == output) connectedWires.Add(w);
         }
-        return false;
+        return connectedWires;
     }
 
     public Wire MakeWire(Circuit from, int output, Circuit to, int input)
@@ -195,11 +216,11 @@ public class LogicManager : NetworkBehaviour
 
         for (int i = 0; i < c.inputs.Count; i++)
         {
-            if (ConnectedWiresOnInput(c, i)) return;
+            if (ConnectedWiresOnInput(c, i).Count > 0) return;
         }
         for (int o = 0; o < c.outputs.Count; o++)
         {
-            if (ConnectedWiresOnOutput(c, o)) return;
+            if (ConnectedWiresOnOutput(c, o).Count > 0) return;
         }
 
         int id = circuit.GetComponent<Circuit>().ID;
@@ -211,6 +232,11 @@ public class LogicManager : NetworkBehaviour
 
     public void PressButton(LogicButton button)
     {
+        if (!IsServer)
+        {
+            PressButtonServerRpc(button.transform.parent.GetComponent<Circuit>().ID);
+            return;
+        }
         button.OnPress();
     }
 
@@ -265,6 +291,11 @@ public class LogicManager : NetworkBehaviour
     {
         RemoveWire(GetWireFromInstanceID(w).gameObject);
     }
+    [ServerRpc(RequireOwnership = false)]
+    private void PressButtonServerRpc(int c)
+    {
+        PressButton(GetCircuitFromInstanceID(c).Find("Button").GetComponent<LogicButton>());
+    }
     
 
     [ClientRpc(RequireOwnership = false)]
@@ -291,6 +322,27 @@ public class LogicManager : NetworkBehaviour
 
         circuit.inputs = inputs.ToList<bool>();
         circuit.outputs = outputs.ToList<bool>();
+
+        for (int i = 0; i < circuit.inputs.Count; i++)
+        {
+            List<Wire> connected = ConnectedWiresOnInput(circuit, i);
+            for (int w = 0; w < connected.Count; w++)
+            {
+                Wire wire = connected[w];
+                LineRenderer line = wire.GetComponent<LineRenderer>();
+                line.material = circuit.inputs[i] ? nodeOn : nodeOff;
+            }
+        }
+        for (int o = 0; o < circuit.outputs.Count; o++)
+        {
+            List<Wire> connected = ConnectedWiresOnInput(circuit, o);
+            for (int w = 0; w < connected.Count; w++)
+            {
+                Wire wire = connected[w];
+                LineRenderer line = wire.GetComponent<LineRenderer>();
+                line.material = circuit.outputs[o] ? nodeOn : nodeOff;
+            }
+        }
     }
     [ClientRpc(RequireOwnership = false)]
     private void MakeWireClientRpc(int myID, int fromID, int output, int toID, int input)

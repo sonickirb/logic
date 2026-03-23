@@ -21,12 +21,16 @@ public class PlayerMovement : NetworkBehaviour
     Vector3 velocity;
     bool isGrounded;
 
+    MeshRenderer hat;
+
     void Start()
     {
         if (!IsOwner) return;
 
         cam = Camera.main;
         cam.GetComponent<MouseLook>().player = transform;
+
+        hat = visual.Find("hat").GetComponent<MeshRenderer>();
     }
 
     // Update is called once per frame
@@ -54,5 +58,6 @@ public class PlayerMovement : NetworkBehaviour
         controller.Move(velocity * Time.deltaTime);
 
         visual.rotation = cam.transform.rotation;
+        if (hat.enabled) hat.enabled = false;
     }
 }
