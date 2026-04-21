@@ -32,6 +32,8 @@ public class Editing : MonoBehaviour
     public AudioSource circuitSFX;
     public AudioSource wireSFX;
 
+    public bool gridSnap;
+
     // Update is called once per frame
     void Update()
     {   
@@ -148,10 +150,15 @@ public class Editing : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha0)) placing = inventory[9];
         }
 
+        if (Input.GetKeyDown(KeyCode.G)) gridSnap = !gridSnap;
+
         place.gameObject.SetActive(placing != null);
         if (placing && hit)
         {
-            place.position = result.point + (result.normal * (place.localScale.y / 2));
+            Vector3 p = result.point;
+            if (gridSnap)
+                p = new Vector3(Mathf.Floor(p.x)*0.5f, p.y, Mathf.Floor(p.z)*0.5f) / 0.5f;
+            place.position = p + (result.normal * (place.localScale.y / 2));
         }
 
         deleteCircuit.gameObject.SetActive(lookingAtCircuit != null);
