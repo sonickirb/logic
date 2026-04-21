@@ -30,13 +30,13 @@ things can and WILL change, duh.
 - [ ] Socket (if we end up making Circuits)
 
 ### controls
-movement: WASD (or joystick)
-camera: Mouse
-lock/unlock mouse: L
-pause/unpause ticking: P
-tick-step: I (only while ticking is paused)
-save: O (this will change)
-remove component: hold F and then right click a component
-remove wire: look at a wire and then right click
-connect wire: click on an output node and then click on an input node
+movement: WASD (or joystick) <br>
+camera: Mouse <br>
+lock/unlock mouse: L <br>
+pause/unpause ticking: P <br>
+tick-step: I (only while ticking is paused) <br>
+save: O (this will change) <br>
+remove component: hold F and then right click a component <br>
+remove wire: look at a wire and then right click <br>
+connect wire: click on an output node and then click on an input node <br>
 > generally outputs are infront while inputs are on the back, the icon on the component can generally guide you though
