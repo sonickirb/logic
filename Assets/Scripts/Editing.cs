@@ -157,7 +157,7 @@ public class Editing : MonoBehaviour
         {
             Vector3 p = result.point;
             if (gridSnap)
-                p = new Vector3(Mathf.Floor(p.x)*0.5f, p.y, Mathf.Floor(p.z)*0.5f) / 0.5f;
+                p = new Vector3((Mathf.Floor(p.x / 0.5f) * 0.5f) + 0.25f, p.y, (Mathf.Floor(p.z / 0.5f) * 0.5f) + 0.25f);
             place.position = p + (result.normal * (place.localScale.y / 2));
         }
 
