@@ -139,8 +139,8 @@ public class LogicManager : NetworkBehaviour
     {
         if (!IsServer) return;
         loading = false;
-        if (Input.GetKeyDown(KeyCode.P) && !autoTick) Tick();
-        if (Input.GetKeyDown(KeyCode.I)) autoTick = !autoTick;
+        if (Input.GetKeyDown(KeyCode.I) && !autoTick) Tick();
+        if (Input.GetKeyDown(KeyCode.P)) autoTick = !autoTick;
         if (Input.GetKeyDown(KeyCode.O)) SaveSystem.SaveWorldData();
     }
 
