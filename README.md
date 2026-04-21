@@ -8,6 +8,7 @@ internally (in the codebase), Components are referred to as "Circuits" at the mo
 - [x] Components, Nodes and Tick-System
 - [x] Networking/Multiplayer (Server/Client architecture)
 - [ ] Circuits (groups of Components)
+- [ ] Inventory
 - [x] Saving
 - [ ] Saving seperate Worlds
 - [ ] Title Screens
