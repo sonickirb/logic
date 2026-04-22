@@ -228,7 +228,7 @@ public class LogicManager : NetworkBehaviour
         }
         GameObject wire = Instantiate(wirePrefab, wires);
         Wire w = wire.AddComponent<Wire>();
-        w.ID = Random.Range(1000000, 9999999);
+        w.ID = Random.Range(0, 9999999);
         w.from = from;
         w.to = to;
         w.output = output;
@@ -401,7 +401,7 @@ public class LogicManager : NetworkBehaviour
         }
         for (int o = 0; o < circuit.outputs.Count; o++)
         {
-            List<Wire> connected = ConnectedWiresOnInput(circuit, o);
+            List<Wire> connected = ConnectedWiresOnOutput(circuit, o);
             for (int w = 0; w < connected.Count; w++)
             {
                 Wire wire = connected[w];
@@ -452,7 +452,7 @@ public class LogicManager : NetworkBehaviour
             }
             for (int o = 0; o < circuit.outputs.Count; o++)
             {
-                List<Wire> connected = ConnectedWiresOnInput(circuit, o);
+                List<Wire> connected = ConnectedWiresOnOutput(circuit, o);
                 for (int w = 0; w < connected.Count; w++)
                 {
                     Wire wire = connected[w];
