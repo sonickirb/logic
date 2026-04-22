@@ -18,9 +18,9 @@ public static class SaveSystem
         Debug.Log("Saved World to " + path);
     }
 
-    public static WorldData LoadWorldData()
+    public static WorldData LoadWorldData(string worldName)
     {
-        string path = Application.persistentDataPath + "/world.fun";
+        string path = Application.persistentDataPath + "/" + worldName + ".fun";
         if (File.Exists(path))
         {
             BinaryFormatter formatter = new BinaryFormatter();
@@ -35,7 +35,6 @@ public static class SaveSystem
         {
             Debug.LogError("World file not found in " + path);
             return null;
-            
         }
     }
 }
