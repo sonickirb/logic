@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +25,8 @@ public class WorldMenuUI : MonoBehaviour
     public TMP_InputField newWorldMenu_worldName;
     public Button newWorldMenu_createWorld;
     public Button newWorldMenu_cancel;
+    public TMP_InputField addressField;
+    public TMP_InputField portField;
 
     [Header("Runtime")]
     public List<string> worldPaths;
@@ -88,6 +91,9 @@ public class WorldMenuUI : MonoBehaviour
     {
         ui.SetActive(false);
         LogicManager.Instance.wrldName = button.wrldName;
+        UnityTransport transport = NetworkManager.Singleton.transform.GetComponent<UnityTransport>();
+        transport.ConnectionData.Address = addressField.text;
+        transport.ConnectionData.Port = ushort.Parse(portField.text);
         NetworkManager.Singleton.StartServer();
     }
     
