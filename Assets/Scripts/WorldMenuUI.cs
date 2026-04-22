@@ -19,6 +19,11 @@ public class WorldMenuUI : MonoBehaviour
     public Transform content;
     public GameObject content_NoWorlds;
     public GameObject worldPrefab;
+    public GameObject newWorldMenu;
+    public Button newWorldButton;
+    public TMP_InputField newWorldMenu_worldName;
+    public Button newWorldMenu_createWorld;
+    public Button newWorldMenu_cancel;
 
     [Header("Runtime")]
     public List<string> worldPaths;
@@ -52,6 +57,17 @@ public class WorldMenuUI : MonoBehaviour
 
         singleplayer.onClick.AddListener(Singleplayer);
         hostServer.onClick.AddListener(HostServer);
+
+        newWorldButton.onClick.AddListener(() =>
+        {
+            newWorldMenu.SetActive(true);
+        });
+        newWorldMenu_cancel.onClick.AddListener(() =>
+        {
+            newWorldMenu_worldName.text = "";
+            newWorldMenu.SetActive(false);
+        });
+        newWorldMenu_createWorld.onClick.AddListener(NewWorld);
     }
 
     public void SelectWorld()
@@ -73,5 +89,13 @@ public class WorldMenuUI : MonoBehaviour
         ui.SetActive(false);
         LogicManager.Instance.wrldName = button.wrldName;
         NetworkManager.Singleton.StartServer();
+    }
+    
+    public void NewWorld()
+    {
+        newWorldMenu.SetActive(false);
+        ui.SetActive(false);
+        LogicManager.Instance.wrldName = newWorldMenu_worldName.text;
+        NetworkManager.Singleton.StartHost();
     }
 }

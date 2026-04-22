@@ -12,9 +12,12 @@ things can and WILL change, duh.
 - [ ] Circuits (groups of Components)
 - [ ] Inventory
 - [x] Saving World
-- [ ] Saving seperate Worlds
+- [x] Saving seperate Worlds
 - [ ] Title Screen
 - [ ] Settings
+- [x] World Menu
+- [x] Creating new Worlds
+- [ ] World settings
 
 ### Components to be added:
 - [x] Buffer
