@@ -13,7 +13,7 @@ this project is a work in progress
 - [x] Networking/Multiplayer (Server/Client architecture)
 - [ ] Circuits (groups of Components)
 - [ ] Inventory
-- [x] Saving World
+- [x] World saving
 - [x] Saving seperate Worlds
 - [ ] Title Screen
 - [ ] Settings
