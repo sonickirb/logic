@@ -34,6 +34,7 @@ public class LogicManager : NetworkBehaviour
     public List<ComponentData> circuitPrefabs;
 
     public bool loading = true;
+    public string wrldName;
 
     void Awake()
     {
@@ -45,7 +46,7 @@ public class LogicManager : NetworkBehaviour
 
     public void LoadWorld()
     {
-        WorldData data = SaveSystem.LoadWorldData();
+        WorldData data = SaveSystem.LoadWorldData(wrldName);
         if (data != null)
         {
             Circuit[] circuitIndex = new Circuit[data.components.Length];
@@ -141,7 +142,7 @@ public class LogicManager : NetworkBehaviour
         loading = false;
         if (Input.GetKeyDown(KeyCode.I) && !autoTick) Tick();
         if (Input.GetKeyDown(KeyCode.P)) autoTick = !autoTick;
-        if (Input.GetKeyDown(KeyCode.O)) SaveSystem.SaveWorldData();
+        if (Input.GetKeyDown(KeyCode.O)) SaveSystem.SaveWorldData(wrldName);
     }
 
     // FixedUpdate is called every logic tick
