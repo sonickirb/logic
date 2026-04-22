@@ -6,6 +6,8 @@ internally (in the codebase), Components are referred to as "Circuits" at the mo
 
 things can and WILL change, duh.
 
+this project is a work in progress
+
 ### complete features (or features to be done)
 - [x] Components, Nodes and Tick-System
 - [x] Networking/Multiplayer (Server/Client architecture)
@@ -43,3 +45,4 @@ remove component: hold F and then right click a component <br>
 remove wire: look at a wire and then right click <br>
 connect wire: click on an output node and then click on an input node <br>
 > generally outputs are infront while inputs are on the back, the icon on the component can generally guide you though
+G: toggle grid-snapping
