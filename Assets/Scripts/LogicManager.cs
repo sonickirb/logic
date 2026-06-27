@@ -57,6 +57,7 @@ public class LogicManager : NetworkBehaviour
             Circuit[] circuitIndex = new Circuit[data.components.Length];
             int inputIndex = 0;
             int outputIndex = 0;
+            int buttonCount = 0;
             for (int i = 0; i < data.components.Length; i++)
             {
                 // to give you a POSITION at THIS JOB youd have to SLAVE AWAY for ONE DOLLAR AN HOUR
@@ -76,6 +77,15 @@ public class LogicManager : NetworkBehaviour
                     while (circuitIndex[i].outputs.Count < data.compOutputCount[i]) circuitIndex[i].outputs.Add(false);
                     circuitIndex[i].outputs[j] = data.outputStates[outputIndex];
                     outputIndex += 1;
+                }
+
+                Transform buttonTransform = circuitIndex[i].transform.Find("Button");
+                if (buttonTransform != null)
+                {
+                    LogicButton button = buttonTransform.GetComponent<LogicButton>();
+                    if (data.buttonStates != null && buttonCount < data.buttonStates.Length)
+                        button.on = data.buttonStates[buttonCount];
+                    buttonCount++;
                 }
             }
             foreach (Circuit c in circuitIndex) {

@@ -17,6 +17,7 @@ public class WorldData
     public bool[] outputStates;
     public int[] compInputCount;
     public int[] compOutputCount;
+    public bool[] buttonStates;
 
     public WorldData()
     {
@@ -34,6 +35,8 @@ public class WorldData
 
         compInputCount = new int[LogicManager.Instance.components.childCount];
         compOutputCount = new int[LogicManager.Instance.components.childCount];
+
+        List<bool> buttonStatesList = new List<bool>();
 
         for (int c = 0; c < LogicManager.Instance.components.childCount; c++)
         {
@@ -59,7 +62,16 @@ public class WorldData
             {
                 outputs.Add(comp.outputs[o]);
             }
+
+            Transform buttonTransform = circuit.Find("Button");
+            if (buttonTransform != null)
+            {
+                LogicButton button = buttonTransform.GetComponent<LogicButton>();
+                buttonStatesList.Add(button.on);
+            }
         }
+
+        buttonStates = buttonStatesList.ToArray();
 
         inputStates = inputs.ToArray();
         outputStates = outputs.ToArray();
