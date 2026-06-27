@@ -15,11 +15,12 @@ this project is a work in progress
 - [ ] Inventory
 - [x] World saving
 - [x] Saving seperate Worlds
-- [ ] Title Screen
+- [x] Title Screen
 - [ ] Settings
 - [x] World Menu
 - [x] Creating new Worlds
 - [ ] World settings
+- [ ] Servers Menu
 
 ### Components to be added:
 - [x] Buffer
@@ -31,7 +32,7 @@ this project is a work in progress
 - [x] XNOR Gate
 - [x] Toggle-Button
 - [x] Pixel
-- [ ] Button (if pressed then on otherwise off)
+- [x] Button (if pressed then on otherwise off)
 - [ ] Socket (if we end up making Circuits)
 
 ### controls
