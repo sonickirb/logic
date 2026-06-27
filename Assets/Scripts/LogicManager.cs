@@ -35,10 +35,14 @@ public class LogicManager : NetworkBehaviour
 
     public bool loading = true;
     public string wrldName;
+    public GameObject loadingUI;
+    public GameObject gameUI;
+    public Editing editing;
 
     void Awake()
     {
         Instance = this;
+        editing.enabled = false;
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientJoined;
         NetworkManager.Singleton.OnServerStarted += LoadWorld;
@@ -46,6 +50,7 @@ public class LogicManager : NetworkBehaviour
 
     public void LoadWorld()
     {
+        loadingUI.SetActive(true);
         WorldData data = SaveSystem.LoadWorldData(wrldName);
         if (data != null)
         {
@@ -90,6 +95,8 @@ public class LogicManager : NetworkBehaviour
         {
             Debug.LogWarning("no World data to load");
         }
+        loadingUI.SetActive(false);
+        editing.enabled = true;
     }
 
     public void OnClientJoined(ulong client)

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Editing : MonoBehaviour
@@ -34,11 +35,34 @@ public class Editing : MonoBehaviour
 
     public bool gridSnap;
 
+    public TMP_Text controlsText;
+    public GameObject gridView;
+
+    void OnEnable()
+    {
+        LogicManager.Instance.gameUI.SetActive(true);
+    }
+    void OnDisable()
+    {
+        LogicManager.Instance.gameUI.SetActive(false);
+    }
+
     // Update is called once per frame
     void Update()
-    {   
+    {
+        List<string> controls = new List<string>();
+
+        if (LogicManager.Instance.IsServer)
+        {
+            controls.Add("Save World - O");
+            controls.Add((LogicManager.Instance.autoTick ? "Disable" : "Enable") + " Ticking - P");
+            if (!LogicManager.Instance.autoTick) controls.Add("Tick - I");
+        }
+
         RaycastHit result;
         bool hit = Physics.Raycast(cam.position, cam.forward, out result, 300f, hitMask);
+        
+        bool IWannaDeleteACircuit = Input.GetKey(KeyCode.F);
 
         bool wireHit;
         lookingAtWire = null;
@@ -58,7 +82,8 @@ public class Editing : MonoBehaviour
             if (wireHit) break;
         }
 
-        bool IWannaDeleteACircuit = Input.GetKey(KeyCode.F);
+
+
 
         if (hit && result.collider.tag == "Node")
         {
@@ -68,10 +93,16 @@ public class Editing : MonoBehaviour
         if (makingWire && lookingAtNode == firstNode) lookingAtNode = null;
         if (placing) lookingAtNode = null;
 
+        if (((hit && result.collider.transform.GetComponent<Circuit>()) || lookingAtWire) && !lookingAtNode && !makingWire && !placing)
+            controls.Add((IWannaDeleteACircuit ? "Stop" : "Start") + " Delete - Hold F");
+
         if (hit && result.collider.transform.GetComponent<Circuit>() && !lookingAtNode && !makingWire && !placing && IWannaDeleteACircuit)
         {
             lookingAtCircuit = result.collider.transform;
         } else lookingAtCircuit = null;
+
+        if (!IWannaDeleteACircuit)
+            lookingAtWire = null;
 
         if (hit && result.collider.tag == "Button" && !lookingAtNode && !lookingAtCircuit && !makingWire && !placing)
         {
@@ -80,6 +111,17 @@ public class Editing : MonoBehaviour
 
         nodeSelector.gameObject.SetActive(lookingAtNode != null);
         if (lookingAtNode) nodeSelector.position = lookingAtNode.position;
+
+        if (!makingWire && lookingAtNode && lookingAtNode.parent.name == "Outputs")
+            controls.Add("Make Wire - LMB");
+        else if (makingWire && lookingAtNode && lookingAtNode.parent.name != "Outputs" && lookingAtNode.parent.parent.name != "Button")
+            controls.Add("Finish Wire - LMB");
+        else if (makingWire && !lookingAtNode)
+            controls.Add("Cancel Wire - LMB");
+        else if (placing)
+            controls.Add("Place Component - LMB");
+        else if (lookingAtButton)
+            controls.Add("Press - LMB");
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -112,6 +154,10 @@ public class Editing : MonoBehaviour
                 LogicManager.Instance.PressButton(lookingAtButton.GetComponent<LogicButton>());
             }
         }
+        if (lookingAtWire)
+            controls.Add("Delete Wire - RMB");
+        else if (lookingAtCircuit)
+            controls.Add("Delete Component - RMB");
         if (Input.GetMouseButtonDown(1))
         {
             if (lookingAtWire)
@@ -150,7 +196,12 @@ public class Editing : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha0)) placing = inventory[9];
         }
 
-        if (Input.GetKeyDown(KeyCode.G)) gridSnap = !gridSnap;
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            gridSnap = !gridSnap;
+            gridView.SetActive(gridSnap);
+        }
+        controls.Add((gridSnap ? "Disable" : "Enable") + " Snapping - G");
 
         place.gameObject.SetActive(placing != null);
         if (placing && hit)
@@ -167,5 +218,8 @@ public class Editing : MonoBehaviour
             deleteCircuit.position = lookingAtCircuit.position;
         }
         
+        controlsText.text = "";
+        foreach (string control in controls)
+            controlsText.text += control + "\n";
     }
 }

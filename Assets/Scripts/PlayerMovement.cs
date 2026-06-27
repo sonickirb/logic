@@ -23,9 +23,21 @@ public class PlayerMovement : NetworkBehaviour
 
     MeshRenderer hat;
 
+    void OnEnable()
+    {
+        if (!IsOwner) return;
+        LogicManager.Instance.editing.enabled = true;
+    }
+    void OnDisable()
+    {
+        if (!IsOwner) return;
+        LogicManager.Instance.editing.enabled = false;
+    }
+
     void Start()
     {
         if (!IsOwner) return;
+        LogicManager.Instance.editing.enabled = true;
 
         cam = Camera.main;
         cam.GetComponent<MouseLook>().player = transform;
