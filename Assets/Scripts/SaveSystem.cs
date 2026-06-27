@@ -2,6 +2,7 @@ using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
+using System.IO.Compression;
 
 public static class SaveSystem
 {
@@ -9,12 +10,26 @@ public static class SaveSystem
     {
         BinaryFormatter formatter = new BinaryFormatter();
         string path = Application.persistentDataPath + "/worlds/" + worldName + ".wrld";
-        FileStream stream = new FileStream(path, FileMode.Create);
 
-        WorldData data = new WorldData();
+        using (FileStream zip = new FileStream(path, FileMode.Create))
+        {
+            using (ZipArchive archive = new ZipArchive(zip, ZipArchiveMode.Create))
+            {
+                ZipArchiveEntry wrldEntry = archive.CreateEntry("world");
+                using (Stream stream = wrldEntry.Open())
+                {
+                    WorldData data = new WorldData();
+                    formatter.Serialize(stream, data);
+                }
+            }
+        }
 
-        formatter.Serialize(stream, data);
-        stream.Close();
+        //FileStream stream = new FileStream(path, FileMode.Create);
+
+        //WorldData data = new WorldData();
+
+        //formatter.Serialize(stream, data);
+        //stream.Close();
 
         Debug.Log("saved World to " + path);
     }
@@ -25,10 +40,22 @@ public static class SaveSystem
         if (File.Exists(path))
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
+            //FileStream stream = new FileStream(path, FileMode.Open);
 
-            WorldData data = formatter.Deserialize(stream) as WorldData;
-            stream.Close();
+            WorldData data;
+
+            using (FileStream zip = new FileStream(path, FileMode.Open))
+            {
+                using (ZipArchive archive = new ZipArchive(zip, ZipArchiveMode.Read))
+                {
+                    ZipArchiveEntry wrldEntry = archive.Entries[0];
+                    using (Stream stream = wrldEntry.Open())
+                        data = formatter.Deserialize(stream) as WorldData;
+                }
+            }
+
+            //WorldData data = formatter.Deserialize(stream) as WorldData;
+            //stream.Close();
             
 
             return data;
