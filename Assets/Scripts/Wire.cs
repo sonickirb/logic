@@ -14,6 +14,7 @@ public class Wire : MonoBehaviour
 
     void Start() { line = GetComponent<LineRenderer>(); }
 
+    // render
     void Update()
     {
         line.SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
