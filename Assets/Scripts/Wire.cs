@@ -13,7 +13,25 @@ public class Wire : MonoBehaviour
 
     LineRenderer line;
 
-    void Start() { line = GetComponent<LineRenderer>(); }
+    void OnEnable() { 
+        line = GetComponent<LineRenderer>();
+    }
+    public void SetFromAndTo(Circuit f, Circuit t)
+    {
+        if (from != null) from.RemoveWireOutput(this, output);
+        if (to != null) to.RemoveWireInput(this, input);
+
+        from = f;
+        to = t;
+        
+        from.AddWireOutput(this, output);
+        to.AddWireInput(this, input);
+    }
+    void OnDestroy()
+    {
+        from.RemoveWireOutput(this, output);
+        to.RemoveWireInput(this, input);
+    }
 
     // render
     void Update()
@@ -26,9 +44,14 @@ public class Wire : MonoBehaviour
     public void Tick()
     {
         bool isOn = false;
-        foreach (Wire w in LogicManager.Instance.ConnectedWiresOnOutput(from, output))
-            if (w.from.outputs[output])
+        int AMOUNT = 0;
+        foreach (Wire w in LogicManager.Instance.ConnectedWiresOnInput(to, input)) {
+            if (w.from.outputs[w.output]) {
                 isOn = true;
+                AMOUNT++;
+            }
+        }
+        //Debug.Log(transform.name + " " + AMOUNT);
         to.inputs[input] = isOn;
     }
 }

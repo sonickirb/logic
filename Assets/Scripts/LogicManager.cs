@@ -220,25 +220,29 @@ public class LogicManager : NetworkBehaviour
 
     public List<Wire> ConnectedWiresOnInput(Circuit circuit, int input)
     {
+        /*
         List<Wire> connectedWires = new List<Wire>();
         for (int i = 0; i < wires.childCount; i++)
         {
             Transform wire = wires.GetChild(i);
             Wire w = wire.GetComponent<Wire>();
             if (w.to == circuit && w.input == input) connectedWires.Add(w);
-        }
-        return connectedWires;
+        }*/
+        if (!circuit.inputWires.ContainsKey(input)) circuit.inputWires[input] = new List<Wire>();
+        return circuit.inputWires[input];
     }
     public List<Wire> ConnectedWiresOnOutput(Circuit circuit, int output)
     {
+        /*
         List<Wire> connectedWires = new List<Wire>();
         for (int i = 0; i < wires.childCount; i++)
         {
             Transform wire = wires.GetChild(i);
             Wire w = wire.GetComponent<Wire>();
             if (w.from == circuit && w.output == output) connectedWires.Add(w);
-        }
-        return connectedWires;
+        }*/
+        if (!circuit.outputWires.ContainsKey(output)) circuit.outputWires[output] = new List<Wire>();
+        return circuit.outputWires[output];
     }
 
     public Wire MakeWire(Circuit from, int output, Circuit to, int input)
@@ -251,10 +255,9 @@ public class LogicManager : NetworkBehaviour
         GameObject wire = Instantiate(wirePrefab, wires);
         Wire w = wire.AddComponent<Wire>();
         w.ID = Random.Range(0, 9999999);
-        w.from = from;
-        w.to = to;
         w.output = output;
         w.input = input;
+        w.SetFromAndTo(from, to);
 
         //wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
         //wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
@@ -530,10 +533,9 @@ public class LogicManager : NetworkBehaviour
         GameObject wire = Instantiate(wirePrefab, wires);
         Wire w = wire.AddComponent<Wire>();
         w.ID = myID;
-        w.from = from;
-        w.to = to;
         w.output = output;
         w.input = input;
+        w.SetFromAndTo(from, to);
 
         //wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
         //wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
@@ -593,10 +595,9 @@ public class LogicManager : NetworkBehaviour
             GameObject wire = Instantiate(wirePrefab, wires);
             Wire w = wire.AddComponent<Wire>();
             w.ID = myID;
-            w.from = from;
-            w.to = to;
             w.output = output;
             w.input = input;
+            w.SetFromAndTo(from, to);
 
             //wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
             //wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);

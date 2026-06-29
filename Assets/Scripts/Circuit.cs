@@ -18,6 +18,44 @@ public class Circuit : MonoBehaviour
     List<GameObject> nodeInputs = new List<GameObject>();
     List<GameObject> nodeOutputs = new List<GameObject>();
 
+    public Dictionary<int, List<Wire>> inputWires;
+    public Dictionary<int, List<Wire>> outputWires;
+
+    void OnEnable()
+    {
+        inputWires = new();
+        outputWires = new();
+    }
+
+    public void AddWireInput(Wire wire, int input)
+    {
+        if (inputWires == null) inputWires = new();
+        if (!inputWires.ContainsKey(input)) inputWires[input] = new();
+
+        inputWires[input].Add(wire);
+    }
+    public void AddWireOutput(Wire wire, int output)
+    {
+        if (outputWires == null) outputWires = new();
+        if (!outputWires.ContainsKey(output)) outputWires[output] = new();
+
+        outputWires[output].Add(wire);
+    }
+    public void RemoveWireInput(Wire wire, int input)
+    {
+        if (inputWires == null) inputWires = new();
+        if (!inputWires.ContainsKey(input)) inputWires[input] = new();
+
+        inputWires[input].Remove(wire);
+    }
+    public void RemoveWireOutput(Wire wire, int output)
+    {
+        if (outputWires == null) outputWires = new();
+        if (!outputWires.ContainsKey(output)) outputWires[output] = new();
+
+        outputWires[output].Remove(wire);
+    }
+
     void Update()
     {
         UpdateNodes();
@@ -27,17 +65,23 @@ public class Circuit : MonoBehaviour
     {
         if (nodeInputsParent == null)  nodeInputsParent  = transform.Find("Inputs");
         if (nodeOutputsParent == null) nodeOutputsParent = transform.Find("Outputs");
+        int inputthing = nodeInputs.Count-1;
         while (nodeInputs.Count < inputs.Count)
         {
             GameObject node = Instantiate(LogicManager.Instance.nodePrefab, nodeInputsParent);
             nodeInputs.Add(node);
             node.layer = LogicManager.Instance.nodeLayer;
+            inputWires.Add(inputthing, new());
+            inputthing++;
         }
+        inputthing = nodeOutputs.Count-1;
         while (nodeOutputs.Count < outputs.Count)
         {
             GameObject node = Instantiate(LogicManager.Instance.nodePrefab, nodeOutputsParent);
             nodeOutputs.Add(node);
             node.layer = LogicManager.Instance.nodeLayer;
+            outputWires.Add(inputthing, new());
+            inputthing++;
         }
 
         for (int i = 0; i < nodeInputs.Count; i++)
