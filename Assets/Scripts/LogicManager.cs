@@ -38,6 +38,7 @@ public class LogicManager : NetworkBehaviour
     public GameObject loadingUI;
     public GameObject gameUI;
     public Editing editing;
+    public int nodeLayer;
 
     void Awake()
     {
@@ -46,6 +47,8 @@ public class LogicManager : NetworkBehaviour
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientJoined;
         NetworkManager.Singleton.OnServerStarted += LoadWorld;
+
+        nodeLayer = LayerMask.NameToLayer("Node");
     }
 
     public void LoadWorld()

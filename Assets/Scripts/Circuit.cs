@@ -31,11 +31,13 @@ public class Circuit : MonoBehaviour
         {
             GameObject node = Instantiate(LogicManager.Instance.nodePrefab, nodeInputsParent);
             nodeInputs.Add(node);
+            node.layer = LogicManager.Instance.nodeLayer;
         }
         while (nodeOutputs.Count < outputs.Count)
         {
             GameObject node = Instantiate(LogicManager.Instance.nodePrefab, nodeOutputsParent);
             nodeOutputs.Add(node);
+            node.layer = LogicManager.Instance.nodeLayer;
         }
 
         for (int i = 0; i < nodeInputs.Count; i++)

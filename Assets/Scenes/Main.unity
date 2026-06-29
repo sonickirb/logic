@@ -6217,6 +6217,9 @@ MonoBehaviour:
   loadingUI: {fileID: 935800404}
   gameUI: {fileID: 1640049690}
   editing: {fileID: 1570481802}
+  nodeLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!114 &1295467715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7246,7 +7249,7 @@ MonoBehaviour:
   cam: {fileID: 1553776558}
   hitMask:
     serializedVersion: 2
-    m_Bits: 769
+    m_Bits: 1793
   wireMask:
     serializedVersion: 2
     m_Bits: 64
