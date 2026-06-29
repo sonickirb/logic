@@ -7246,15 +7246,19 @@ MonoBehaviour:
   cam: {fileID: 1553776558}
   hitMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 257
   wireMask:
     serializedVersion: 2
     m_Bits: 64
+  moveMask:
+    serializedVersion: 2
+    m_Bits: 1
   nodeSelector: {fileID: 2145578202}
   wireMaking: {fileID: 1139057521}
   lineCollider: {fileID: 1015506889}
   lookingAtNode: {fileID: 0}
   makingWire: 0
+  moving: {fileID: 0}
   place: {fileID: 770748101}
   deleteCircuit: {fileID: 1013383024}
   placing: {fileID: 0}

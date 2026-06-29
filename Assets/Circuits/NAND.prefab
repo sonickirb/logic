@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8107243399323875068}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Outputs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7148830786033714194}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Inputs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,7 +75,7 @@ GameObject:
   - component: {fileID: 3235592923458138213}
   - component: {fileID: 9118377274530539091}
   - component: {fileID: 9044664099550045086}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: NAND
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -183,6 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afa04caf9cc007d48a6126b3b25a51a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ID: 0
   inputs: 0000
   outputs: 
   scriptID: NAND
@@ -197,7 +198,7 @@ GameObject:
   - component: {fileID: 2547821915742215591}
   - component: {fileID: 7981386329267576850}
   - component: {fileID: 3888550484024816428}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}

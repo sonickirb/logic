@@ -10,6 +10,7 @@ public class Editing : MonoBehaviour
 
     public LayerMask hitMask;
     public LayerMask wireMask;
+    public LayerMask moveMask;
     public Transform nodeSelector;
     public LineRenderer wireMaking;
     public CapsuleCollider lineCollider;
@@ -63,7 +64,7 @@ public class Editing : MonoBehaviour
         controls.Add("Lock Mouse - L");
 
         RaycastHit result;
-        bool hit = Physics.Raycast(cam.position, cam.forward, out result, 300f, hitMask);
+        bool hit = Physics.Raycast(cam.position, cam.forward, out result, 300f, (moving || placing) ? moveMask : hitMask);
         
         bool IWannaDeleteACircuit = Input.GetKey(KeyCode.F);
 
