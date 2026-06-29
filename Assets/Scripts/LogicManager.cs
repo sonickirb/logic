@@ -39,6 +39,8 @@ public class LogicManager : NetworkBehaviour
     public GameObject gameUI;
     public Editing editing;
     public int nodeLayer;
+    public AudioClip keyDownClip;
+    public AudioClip keyUpClip;
 
     void Awake()
     {
@@ -329,12 +331,15 @@ public class LogicManager : NetworkBehaviour
 
     public void PressButton(LogicButton button)
     {
+        int ID = button.transform.parent.GetComponent<Circuit>().ID;
         if (!IsServer)
         {
-            PressButtonServerRpc(button.transform.parent.GetComponent<Circuit>().ID);
+            PressButtonServerRpc(ID);
             return;
         }
         button.OnPress();
+
+        PressButtonClientRpc(ID);
     }
 
     public int GetCircuitIDFromName(string name)
@@ -421,6 +426,12 @@ public class LogicManager : NetworkBehaviour
     {
         if (IsHost || loading) return;
         Destroy(GetCircuitFromInstanceID(c).gameObject);
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void PressButtonClientRpc(int ID)
+    {
+        if (IsHost || loading) return;
+        GetCircuitFromInstanceID(ID).transform.Find("Button").GetComponent<LogicButton>().OnPress();
     }
     [ClientRpc(RequireOwnership = false)]
     private void UpdateCircuitClientRpc(int c, bool[] inputs, bool[] outputs)

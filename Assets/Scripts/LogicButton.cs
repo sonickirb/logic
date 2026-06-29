@@ -15,14 +15,17 @@ public class LogicButton : MonoBehaviour
         me = transform.parent.GetComponent<Circuit>();
     }
 
-    public void OnPress() { on = !on; }
+    public void OnPress() {
+        on = !on;
+        GetComponent<AudioSource>().PlayOneShot(on ? LogicManager.Instance.keyDownClip : LogicManager.Instance.keyUpClip);
+    }
 
     // render
     void Update()
     {
         Vector3 to = new Vector3(0f, 1f, 0f);
         if (on) to = new Vector3(0f, 0.5f, 0f);
-        transform.localPosition = Vector3.Lerp(transform.localPosition, to, Time.deltaTime * 10f);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, to, Time.deltaTime * 21f);
     }
 
     public void Tick()
