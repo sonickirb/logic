@@ -286,6 +286,19 @@ public class LogicManager : NetworkBehaviour
         return circuit.GetComponent<Circuit>();
     }
 
+    public void MoveCircuit(Transform move, Vector3 to)
+    {
+        int ID = move.GetComponent<Circuit>().ID;
+        if (!IsServer)
+        {
+            MoveCircuitServerRpc(ID, to);
+            return;
+        }
+        move.position = to;
+
+        MoveCircuitClientRpc(ID, to);
+    }
+
     public void RemoveCircuit(GameObject circuit)
     {
         if (!IsServer)
@@ -356,6 +369,11 @@ public class LogicManager : NetworkBehaviour
         MakeCircuit(circuitPrefabs[ID].prefab, at);
     }
     [ServerRpc(RequireOwnership = false)]
+    private void MoveCircuitServerRpc(int ID, Vector3 at)
+    {
+        MoveCircuit(GetCircuitFromInstanceID(ID), at);
+    }
+    [ServerRpc(RequireOwnership = false)]
     private void DeleteCircuitServerRpc(int c)
     {
         RemoveCircuit(GetCircuitFromInstanceID(c).gameObject);
@@ -388,6 +406,12 @@ public class LogicManager : NetworkBehaviour
         circuit.GetComponent<Circuit>().ID = myID;
         circuit.transform.position = at;
         circuit.name = of.name;
+    }
+    [ClientRpc(RequireOwnership = false)]
+    private void MoveCircuitClientRpc(int ID, Vector3 to)
+    {
+        if (IsHost || loading) return;
+        GetCircuitFromInstanceID(ID).transform.position = to;
     }
     [ClientRpc(RequireOwnership = false)]
     private void DeleteCircuitClientRpc(int c)

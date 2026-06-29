@@ -21,6 +21,7 @@ public class Editing : MonoBehaviour
     RaycastHit wireResult;
     Transform lookingAtWire;
 
+    public Transform moving;
     public Transform place;
     public Transform deleteCircuit;
     public GameObject placing;
@@ -58,6 +59,8 @@ public class Editing : MonoBehaviour
             controls.Add((LogicManager.Instance.autoTick ? "Disable" : "Enable") + " Ticking - P");
             if (!LogicManager.Instance.autoTick) controls.Add("Tick - I");
         }
+
+        controls.Add("Lock Mouse - L");
 
         RaycastHit result;
         bool hit = Physics.Raycast(cam.position, cam.forward, out result, 300f, hitMask);
@@ -100,6 +103,12 @@ public class Editing : MonoBehaviour
         {
             lookingAtCircuit = result.collider.transform;
         } else lookingAtCircuit = null;
+        Transform toMoveCircuit = null;
+        if (hit && result.collider.transform.GetComponent<Circuit>() && !lookingAtNode && !makingWire && !placing && !IWannaDeleteACircuit)
+        {
+            controls.Add("Move Component - LMB");
+            toMoveCircuit = result.collider.transform;
+        }
 
         if (!IWannaDeleteACircuit)
             lookingAtWire = null;
@@ -119,6 +128,8 @@ public class Editing : MonoBehaviour
         else if (makingWire && !lookingAtNode)
             controls.Add("Cancel Wire - LMB");
         else if (placing)
+            controls.Add("Place Component - LMB");
+        else if (moving)
             controls.Add("Place Component - LMB");
         else if (lookingAtButton)
             controls.Add("Press - LMB");
@@ -149,6 +160,13 @@ public class Editing : MonoBehaviour
                 LogicManager.Instance.MakeCircuit(placing, place.position);
                 placing = null;
                 circuitSFX.Play();
+            } else if (moving) {
+                LogicManager.Instance.MoveCircuit(moving, moving.position);
+                moving = null;
+                circuitSFX.Play();
+            } else if (toMoveCircuit)
+            {
+                moving = toMoveCircuit;
             } else if (lookingAtButton)
             {
                 LogicManager.Instance.PressButton(lookingAtButton.GetComponent<LogicButton>());
@@ -203,13 +221,22 @@ public class Editing : MonoBehaviour
         }
         controls.Add((gridSnap ? "Disable" : "Enable") + " Snapping - G");
 
-        place.gameObject.SetActive(placing != null);
+        place.gameObject.SetActive(placing != null || moving != null || toMoveCircuit != null);
+        if (toMoveCircuit != null) place.position = toMoveCircuit.position;
         if (placing && hit)
         {
             Vector3 p = result.point;
             if (gridSnap)
                 p = new Vector3((Mathf.Floor(p.x / 0.5f) * 0.5f) + 0.25f, p.y, (Mathf.Floor(p.z / 0.5f) * 0.5f) + 0.25f);
             place.position = p + (result.normal * (place.localScale.y / 2));
+        }
+        if (moving && hit)
+        {
+            Vector3 p = result.point;
+            if (gridSnap)
+                p = new Vector3((Mathf.Floor(p.x / 0.5f) * 0.5f) + 0.25f, p.y, (Mathf.Floor(p.z / 0.5f) * 0.5f) + 0.25f);
+            moving.position = p + (result.normal * (moving.localScale.y / 2));
+            place.position = moving.position;
         }
 
         deleteCircuit.gameObject.SetActive(lookingAtCircuit != null);

@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 649210655650962628}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.023, y: 0, z: 0.026}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -330,14 +330,19 @@ MonoBehaviour:
   controller: {fileID: 4056552193259227303}
   visual: {fileID: 3444991591021404413}
   cam: {fileID: 0}
-  speed: 5
+  speed: 200
   gravity: -19.62
-  jumpHeight: 1.5
+  jumpHeight: 1
   groundCheck: {fileID: 8753268424868143253}
   groundDistance: 0.1
   groundMask:
     serializedVersion: 2
     m_Bits: 1
+  flyTimer: 0
+  flying: 0
+  groundDamp: {x: 0.75, y: 1, z: 0.75}
+  airDamp: {x: 0.8, y: 1, z: 0.8}
+  flyDamp: {x: 0.9, y: 0.9, z: 0.9}
 --- !u!114 &346021057460008463
 MonoBehaviour:
   m_ObjectHideFlags: 0
