@@ -251,8 +251,8 @@ public class LogicManager : NetworkBehaviour
         w.output = output;
         w.input = input;
 
-        wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
-        wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
+        //wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
+        //wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
 
         MakeWireClientRpc(w.ID, from.ID, output, to.ID, input);
 
@@ -430,6 +430,7 @@ public class LogicManager : NetworkBehaviour
 
         circuit.Extra();
 
+        /*
         for (int i = 0; i < circuit.inputs.Count; i++)
         {
             List<Wire> connected = ConnectedWiresOnInput(circuit, i);
@@ -449,7 +450,7 @@ public class LogicManager : NetworkBehaviour
                 LineRenderer line = wire.GetComponent<LineRenderer>();
                 line.material = circuit.outputs[o] ? nodeOn : nodeOff;
             }
-        }
+        }*/
     }
     [ClientRpc(RequireOwnership = false)]
     private void UpdateCircuitsClientRpc(int[] IDs, int[] inputCounts, int[] outputCounts, bool[] cInputs, bool[] cOutputs)
@@ -481,6 +482,7 @@ public class LogicManager : NetworkBehaviour
 
             circuit.Extra();
 
+            /*
             for (int i = 0; i < circuit.inputs.Count; i++)
             {
                 List<Wire> connected = ConnectedWiresOnInput(circuit, i);
@@ -501,6 +503,7 @@ public class LogicManager : NetworkBehaviour
                     line.material = circuit.outputs[o] ? nodeOn : nodeOff;
                 }
             }
+            */
         }
     }
     [ClientRpc(RequireOwnership = false)]
@@ -518,8 +521,8 @@ public class LogicManager : NetworkBehaviour
         w.output = output;
         w.input = input;
 
-        wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
-        wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
+        //wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
+        //wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
     }
     [ClientRpc(RequireOwnership = false)]
     private void DeleteWireClientRpc(int w)
@@ -581,8 +584,8 @@ public class LogicManager : NetworkBehaviour
             w.output = output;
             w.input = input;
 
-            wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
-            wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
+            //wire.GetComponent<LineRenderer>().SetPosition(0, from.transform.Find("Outputs").Find(output.ToString()).position);
+            //wire.GetComponent<LineRenderer>().SetPosition(1, to.transform.Find("Inputs").Find(input.ToString()).position);
         }
         loading = false;
     }

@@ -87,6 +87,12 @@ public class Editing : MonoBehaviour
         }
 
 
+        Transform toMoveCircuit = null;
+        if (hit && result.collider.transform.GetComponent<Circuit>() && !makingWire && !placing && !IWannaDeleteACircuit)
+        {
+            controls.Add("Move Component - LMB");
+            toMoveCircuit = result.collider.transform;
+        }
 
 
         if (hit && result.collider.tag == "Node")
@@ -95,7 +101,7 @@ public class Editing : MonoBehaviour
         } else lookingAtNode = null;
 
         if (makingWire && lookingAtNode == firstNode) lookingAtNode = null;
-        if (placing) lookingAtNode = null;
+        if (placing || moving || toMoveCircuit) lookingAtNode = null;
 
         if (((hit && result.collider.transform.GetComponent<Circuit>()) || lookingAtWire) && !lookingAtNode && !makingWire && !placing)
             controls.Add((IWannaDeleteACircuit ? "Stop" : "Start") + " Delete - Hold F");
@@ -104,17 +110,11 @@ public class Editing : MonoBehaviour
         {
             lookingAtCircuit = result.collider.transform;
         } else lookingAtCircuit = null;
-        Transform toMoveCircuit = null;
-        if (hit && result.collider.transform.GetComponent<Circuit>() && !lookingAtNode && !makingWire && !placing && !IWannaDeleteACircuit)
-        {
-            controls.Add("Move Component - LMB");
-            toMoveCircuit = result.collider.transform;
-        }
 
         if (!IWannaDeleteACircuit)
             lookingAtWire = null;
 
-        if (hit && result.collider.tag == "Button" && !lookingAtNode && !lookingAtCircuit && !makingWire && !placing)
+        if (hit && result.collider.tag == "Button" && !lookingAtNode && !lookingAtCircuit && !makingWire && !placing && !moving)
         {
             lookingAtButton = result.collider.transform;
         } else lookingAtButton = null;

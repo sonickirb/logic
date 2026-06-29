@@ -7246,7 +7246,7 @@ MonoBehaviour:
   cam: {fileID: 1553776558}
   hitMask:
     serializedVersion: 2
-    m_Bits: 257
+    m_Bits: 769
   wireMask:
     serializedVersion: 2
     m_Bits: 64
