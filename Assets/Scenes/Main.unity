@@ -6347,6 +6347,9 @@ MonoBehaviour:
   - name: Pixel
     prefab: {fileID: 7961296223909989401, guid: 0aaf101a5b878094bbb8dce18fe81066,
       type: 3}
+  - name: Pixel
+    prefab: {fileID: 7961296223909989401, guid: 0aaf101a5b878094bbb8dce18fe81066,
+      type: 3}
   loading: 1
   wrldName: 
   loadingUI: {fileID: 935800404}
@@ -7418,6 +7421,7 @@ MonoBehaviour:
   gridSnap: 0
   controlsText: {fileID: 134052649}
   gridView: {fileID: 1456568610}
+  circuitLayer: 0
 --- !u!1 &1570542072
 GameObject:
   m_ObjectHideFlags: 0

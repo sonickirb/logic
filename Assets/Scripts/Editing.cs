@@ -40,6 +40,13 @@ public class Editing : MonoBehaviour
     public TMP_Text controlsText;
     public GameObject gridView;
 
+    public int circuitLayer;
+
+    void Start()
+    {
+        circuitLayer = LayerMask.NameToLayer("Circuit");
+    }
+
     void OnEnable()
     {
         LogicManager.Instance.gameUI.SetActive(true);
@@ -86,14 +93,12 @@ public class Editing : MonoBehaviour
             if (wireHit) break;
         }
 
-
         Transform toMoveCircuit = null;
         if (hit && result.collider.transform.GetComponent<Circuit>() && !makingWire && !placing && !IWannaDeleteACircuit)
         {
             controls.Add("Move Component - LMB");
             toMoveCircuit = result.collider.transform;
         }
-
 
         if (hit && result.collider.tag == "Node")
         {

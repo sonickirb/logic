@@ -177,17 +177,19 @@ public class LogicManager : NetworkBehaviour
     public void Tick()
     {
         if (!IsServer) return;
+        
+        Circuit[] componentList = components.GetComponentsInChildren<Circuit>();
 
-        int[] networkIDs = new int[components.childCount];
+        int[] networkIDs = new int[componentList.Length];
         List<bool> networkInputs = new List<bool>();
         List<bool> networkOutputs = new List<bool>();
-        int[] networkInputCount = new int[components.childCount];
-        int[] networkOutputCount = new int[components.childCount];
+        int[] networkInputCount = new int[componentList.Length];
+        int[] networkOutputCount = new int[componentList.Length];
 
-        for (int i = 0; i < components.childCount; i++)
+        for (int i = 0; i < componentList.Length; i++)
         {
-            Transform component = components.GetChild(i);
-            Circuit circuit = component.GetComponent<Circuit>();
+            Circuit circuit = componentList[i];
+            //Transform component = circuit.transform;
 
             for (int n = 0; n < circuit.inputs.Count; n++)
             {
