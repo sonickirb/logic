@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class TitleUI : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class TitleUI : MonoBehaviour
     public Button serversButton;
     public Button exitServersButton;
     public Button quitButton;
+    public TMP_Text versionText;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +37,8 @@ public class TitleUI : MonoBehaviour
             serversMenu.SetActive(false);
         });
         quitButton.onClick.AddListener(Application.Quit);
+
+        versionText.text = Application.version;
     }
 
     // Update is called once per frame

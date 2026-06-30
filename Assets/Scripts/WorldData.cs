@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class WorldData
 {
+    public string version;
     public int[] components;
     public float[] positionX;
     public float[] positionY;
@@ -21,7 +22,7 @@ public class WorldData
 
     public WorldData()
     {
-
+        version = Application.version;
 
         components = new int[LogicManager.Instance.components.childCount];
         positionX = new float[LogicManager.Instance.components.childCount];
