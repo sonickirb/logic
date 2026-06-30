@@ -42,20 +42,24 @@ public class WorldMenuUI : MonoBehaviour
             i++;
             FileInfo info = new FileInfo(path);
             string wrldName = info.Name.Split(".")[0];
-            
-            WorldMenuButton world = Instantiate(worldPrefab).GetComponent<WorldMenuButton>();
-            world.wrldName = wrldName;
-            world.filePath = path;
-            world.tmp.text = wrldName;
-            world.GetComponent<Button>().onClick.AddListener(() =>
+            WorldData wrldData = SaveSystem.LoadWorldData(wrldName);
+            if (wrldData != null)
             {
-                button = world;
-                SelectWorld();
-            });
-            world.transform.name = i.ToString();
-            world.transform.parent = content;
+                WorldMenuButton world = Instantiate(worldPrefab).GetComponent<WorldMenuButton>();
+                world.wrldName = wrldName;
+                world.filePath = path;
+                world.tmp.text = wrldName;
+                world.dataText.text = "Version: " + (wrldData.version ?? "Old");
+                world.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    button = world;
+                    SelectWorld();
+                });
+                world.transform.name = i.ToString();
+                world.transform.SetParent(content);
+            } else Debug.LogWarning("couldn't load \"" + wrldName + "\"!");
         }
-        if (i == 0)
+        if (i == 0 || content.GetComponentsInChildren<WorldMenuButton>().Length < 1)
             content_NoWorlds.SetActive(true);
 
         singleplayer.onClick.AddListener(Singleplayer);

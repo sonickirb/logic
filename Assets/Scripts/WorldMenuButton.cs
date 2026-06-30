@@ -8,4 +8,5 @@ public class WorldMenuButton : MonoBehaviour
     public TMP_Text tmp;
     public RawImage icon;
     public string wrldName;
+    public TMP_Text dataText;
 }
