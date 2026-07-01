@@ -48,3 +48,4 @@ connect wire: click on an output node and then click on an input node <br>
 > generally outputs are infront while inputs are on the back, the icon on the component can generally guide you though
 <br>
 G: toggle grid-snapping
+> test
