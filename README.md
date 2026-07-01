@@ -20,7 +20,7 @@ this project is a work in progress
 - [x] World Menu
 - [x] Creating new Worlds
 - [ ] World settings
-- [ ] Servers Menu
+- [-] Servers Menu
 
 ### Components to be added:
 - [x] Buffer
