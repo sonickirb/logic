@@ -108,8 +108,10 @@ public class Circuit : MonoBehaviour
         }
     }
 
-    public void Tick()
+    public bool Tick()
     {
+        bool changed = false;
+
         if (script == null)
         {
             script = LogicManager.Instance.transform.Find(scriptID).GetComponent<CircuitDerive>();
@@ -119,9 +121,20 @@ public class Circuit : MonoBehaviour
         for (int i = 0; i < got.Length; i++)
         {
             if (outputs.Count < got.Length) outputs.Add(false);
+            bool old = outputs[i];
             outputs[i] = got[i];
+            if (outputs[i] != old) changed = true;
         }
         while (outputs.Count > got.Length) outputs.RemoveAt(outputs.Count-1);
+
+        if (transform.Find("Pixel"))
+        {
+            Material a = inputs[0] ? LogicManager.Instance.pixelOn : LogicManager.Instance.pixelOff;
+            if (transform.Find("Pixel").GetComponent<MeshRenderer>().material != a)
+                changed = true;
+        }
+
+        return changed;
     }
 
     public void Extra()

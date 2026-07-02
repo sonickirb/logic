@@ -116,7 +116,7 @@ public class LogicManager : NetworkBehaviour
 
     public void OnClientJoined(ulong client)
     {
-        if (IsHost) return;
+        if (client == NetworkManager.Singleton.LocalClientId) return;
 
         List<int> circuitIDs = new List<int>();
         List<int> circuitInstanceIDs = new List<int>();
@@ -180,11 +180,11 @@ public class LogicManager : NetworkBehaviour
         
         Circuit[] componentList = components.GetComponentsInChildren<Circuit>();
 
-        int[] networkIDs = new int[componentList.Length];
-        List<bool> networkInputs = new List<bool>();
-        List<bool> networkOutputs = new List<bool>();
-        int[] networkInputCount = new int[componentList.Length];
-        int[] networkOutputCount = new int[componentList.Length];
+        List<int> networkIDs = new();
+        List<bool> networkInputs = new();
+        List<bool> networkOutputs = new();
+        List<int> networkInputCount = new();
+        List<int> networkOutputCount = new();
 
         for (int i = 0; i < componentList.Length; i++)
         {
@@ -196,12 +196,15 @@ public class LogicManager : NetworkBehaviour
                 if (ConnectedWiresOnInput(circuit, n).Count < 1) circuit.inputs[n] = false;
             }
 
-            circuit.Tick();
+            bool changed = circuit.Tick();
             
             //UpdateCircuitClientRpc(circuit.ID, circuit.inputs.ToArray(), circuit.outputs.ToArray());
-            networkIDs[i] = circuit.ID;
-            networkInputCount[i] = circuit.inputs.Count;
-            networkOutputCount[i] = circuit.outputs.Count;
+
+            if (!changed) continue;
+
+            networkIDs.Add(circuit.ID);
+            networkInputCount.Add(circuit.inputs.Count);
+            networkOutputCount.Add(circuit.outputs.Count);
             
             for (int j = 0; j < circuit.inputs.Count; j++) networkInputs.Add(circuit.inputs[j]);
             for (int j = 0; j < circuit.outputs.Count; j++) networkOutputs.Add(circuit.outputs[j]);
@@ -217,7 +220,7 @@ public class LogicManager : NetworkBehaviour
             line.material = w.from.outputs[w.output] ? nodeOn : nodeOff;
         }
 
-        UpdateCircuitsClientRpc(networkIDs, networkInputCount, networkOutputCount, networkInputs.ToArray(), networkOutputs.ToArray());
+        UpdateCircuitsClientRpc(networkIDs.ToArray(), networkInputCount.ToArray(), networkOutputCount.ToArray(), networkInputs.ToArray(), networkOutputs.ToArray());
     }
 
     public List<Wire> ConnectedWiresOnInput(Circuit circuit, int input)
