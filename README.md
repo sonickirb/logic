@@ -1,4 +1,6 @@
 # logic
+![Discord](https://img.shields.io/badge/discord-server-blue?logo=discord&link=https://discord.gg/rrBBeSXn2T)
+![Latest](https://img.shields.io/badge/release-latest-blue?logo=itch&link=https://sonickirb.itch.io/logic)
 
 ### information
 internally (in the codebase), Components are referred to as "Circuits" at the moment.
