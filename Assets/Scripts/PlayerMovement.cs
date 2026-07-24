@@ -54,6 +54,8 @@ public class PlayerMovement : NetworkBehaviour
 
         hat = visual.Find("hat").GetComponent<MeshRenderer>();
         visualRenderer = visual.GetComponent<MeshRenderer>();
+        
+        DiscordManager.me.SetActivity("Playing", "on World \"" + LogicManager.Instance.wrldName + "\"");
     }
 
     // Update is called once per frame
