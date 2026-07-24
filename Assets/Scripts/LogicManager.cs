@@ -116,7 +116,7 @@ public class LogicManager : NetworkBehaviour
 
     public void OnClientJoined(ulong client)
     {
-        if (client == NetworkManager.Singleton.LocalClientId) return;
+        //if (client != NetworkManager.Singleton.LocalClient.ClientId) return;
 
         List<int> circuitIDs = new List<int>();
         List<int> circuitInstanceIDs = new List<int>();
@@ -555,7 +555,8 @@ public class LogicManager : NetworkBehaviour
     private void UpdateWorldClientRpc(ulong client, int[] circuitIDs, int[] circuitInstanceIDs, Vector3[] circuitPositions, int[] wireIDs, 
         int[] wireFromIDs, int[] wireOutputs, int[] wireToIDs, int[] wireInputs, int[] inputCounts, bool[] inputs, int[] outputCounts, bool[] outputs)
     {
-        if (IsHost || client != NetworkManager.Singleton.LocalClientId) return;
+        Debug.Log("incoming updateworld for \"" + client + "\" i am \"" + NetworkManager.Singleton.LocalClient.ClientId + "\"");
+        if (IsHost || client != NetworkManager.Singleton.LocalClient.ClientId) return;
         int inputIndex = 0;
         int outputIndex = 0;
         for (int i = 0; i < circuitIDs.Length; i++)
